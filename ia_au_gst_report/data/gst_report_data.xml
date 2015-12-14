@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	
+	<record id="gst_report_root" model="account.tax.report">
+		<field name="name">GST Report</field>
+		<field name="type">sum</field>
+	</record>
+	
+	<record id="net_gst_to_paid_or_reclaimed" model="account.tax.report">
+		<field name="name">Net GST to be Paid/Reclaimed</field>
+		<field name="type">sum</field>
+		<field name="parent_id" ref="gst_report_root"/>
+	</record>
+	
+	<record id="gst_on_sales_and_other_inputs" model="account.tax.report">
+		<field name="name">GST on Sales and other Outputs</field>
+		<field name="type">account_type</field>
+		<field name="parent_id" ref="net_gst_to_paid_or_reclaimed"/>
+		<field name="tax_ids" eval="[(6, 0, [ref('gst_taxable_sale'),ref('gst_taxable_sale_incl'),ref('export_sales'),
+		ref('gst_free_sales'),ref('input_taxed_sales')])]"/>
+	</record>
+	
+	<record id="gst_reclaimed_on_purchases_and_other_inputs" model="account.tax.report">
+		<field name="name">GST Reclaimed on Purchases and other Inputs</field>
+		<field name="type">account_type</field>
+		<field name="parent_id" ref="net_gst_to_paid_or_reclaimed"/>
+		<field name="tax_ids" eval="[(6, 0, [ref('non_capital_purchase'),ref('non_capital_purchase_incl'),
+		ref('capital_purchase'),ref('input_taxed_purchases'), ref('non_taxable_importations'),
+		ref('gst_imported_goods'),ref('gst_not_registered'),ref('no_abn_withholding'),
+		ref('voluntary_withholdings'),ref('luxury_car_tax'),ref('private_use'),ref('wet_applicable_purchases'),
+		ref('gst_wine_equivalent_tax'),ref('combined_wet_and_wgst'),ref('combined_cellar_door'),
+		ref('cellar_door_gst'),ref('cellar_door_wet')])]"/>
+	</record>
+	
+	<record id="gst_on_purchases_1b" model="account.tax.report">
+		<field name="name">GST on Purchases (1B)</field>
+		<field name="type">account_type</field>
+		<field name="parent_id" ref="gst_report_root"/>
+		<field name="tax_ids" eval="[(6, 0, [ref('capital_purchase'),ref('input_taxed_purchases'), ref('non_taxable_importations'),ref('gst_imported_goods'),ref('gst_not_registered'),ref('no_abn_withholding'),ref('voluntary_withholdings'),ref('luxury_car_tax'),ref('private_use'),ref('wet_applicable_purchases'),
+		ref('gst_wine_equivalent_tax'),ref('combined_wet_and_wgst'),ref('combined_cellar_door'),
+		ref('cellar_door_gst'),ref('cellar_door_wet')])]"/>
+	</record>
+	
+	<record id="gst_on_sales_1a" model="account.tax.report">
+		<field name="name">GST on Sales (1A)</field>
+		<field name="type">account_type</field>
+		<field name="parent_id" ref="gst_report_root"/>
+		<field name="tax_ids" eval="[(6, 0, [ref('gst_taxable_sale'),ref('gst_taxable_sale_incl'),ref('export_sales'),
+		ref('gst_free_sales'),ref('input_taxed_sales')])]"/>
+	</record>
+	
+	<record id="total_value_of_sales_ex_gst" model="account.tax.report">
+		<field name="name">Total Value of Sales ex GST (G1)</field>
+		<field name="type">account_type</field>
+		<field name="parent_id" ref="gst_report_root"/>
+		<field name="tax_ids" eval="[(6, 0, [ref('gst_taxable_sale'),ref('gst_taxable_sale_incl'),ref('export_sales'),
+		ref('gst_free_sales'),ref('input_taxed_sales')])]"/>
+	</record>
+	
+	<record id="export_sales_g2" model="account.tax.report">
+		<field name="name">Export Sales (G2)</field>
+		<field name="type">account_type</field>
+		<field name="parent_id" ref="gst_report_root"/>
+		<field name="tax_ids" eval="[(6, 0, [ref('export_sales')])]"/>
+	</record>
+	
+	<record id="other_gst_free_sales_g3" model="account.tax.report">
+		<field name="name">Other GST free Sales (G3)</field>
+		<field name="type">account_type</field>
+		<field name="parent_id" ref="gst_report_root"/>
+		<field name="tax_ids" eval="[(6, 0, [ref('gst_taxable_sale'),ref('gst_taxable_sale_incl'),
+		ref('gst_free_sales'),ref('input_taxed_sales')])]"/>
+	</record>
+	
+	<record id="capital_purchases_g10" model="account.tax.report">
+		<field name="name">Capital Purchases (G10)</field>
+		<field name="type">account_type</field>
+		<field name="parent_id" ref="gst_report_root"/>
+		<field name="tax_ids" eval="[(6, 0, [ref('capital_purchase')])]"/>
+	</record>
+	
+	<record id="non_capital_purchases_g11" model="account.tax.report">
+		<field name="name">Non Capital Purchases (G11)</field>
+		<field name="type">account_type</field>
+		<field name="parent_id" ref="gst_report_root"/>
+		<field name="tax_ids" eval="[(6, 0, [ref('non_capital_purchase'),ref('non_capital_purchase_incl')])]"/>
+	</record>
+	
+	<record id="gst_on_sales_1a" model="account.tax.report">
+		<field name="name">GST on Sales (1A)</field>
+		<field name="type">account_type</field>
+		<field name="parent_id" ref="gst_report_root"/>
+		<field name="tax_ids" eval="[(6, 0, [ref('gst_taxable_sale'),ref('gst_taxable_sale_incl'),ref('export_sales'),
+		ref('gst_free_sales'),ref('input_taxed_sales')])]"/>
+	</record>
+	
+	<record id="detailed_gst_tax_report" model="account.tax.report">
+		<field name="name">Detailed GST Tax Report</field>
+		<field name="type">detailed_report</field>
+		<field name="parent_id" eval="False"/>
+		<field name="tax_ids" eval="[(6, 0, [ref('gst_taxable_sale'),ref('gst_taxable_sale_incl'),ref('export_sales'),
+		ref('gst_free_sales'),ref('input_taxed_sales'),ref('non_capital_purchase'),ref('non_capital_purchase_incl'),
+		ref('capital_purchase'),ref('input_taxed_purchases'), ref('non_taxable_importations'),
+		ref('gst_imported_goods'),ref('gst_not_registered'),ref('no_abn_withholding'),
+		ref('voluntary_withholdings'),ref('luxury_car_tax'),ref('private_use'),ref('wet_applicable_purchases'),
+		ref('gst_wine_equivalent_tax'),ref('combined_wet_and_wgst'),ref('combined_cellar_door'),
+		 ref('cellar_door_gst'),ref('cellar_door_wet')])]"/>
+	</record>
+</odoo>
