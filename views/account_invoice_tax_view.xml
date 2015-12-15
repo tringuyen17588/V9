@@ -6,7 +6,7 @@
 		<field name="inherit_id" ref="account.invoice_form"/>
 		<field name="arch" type="xml">
 			<xpath expr="//field[@name='tax_line_ids']/tree/field[@name='amount']" position="after">
-				<field name="line_total_tax_excluded"/>
+				<field name="line_total_tax_excluded" invisible="1"/>
 			</xpath>
 		</field>		
 	</record>

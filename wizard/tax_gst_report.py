@@ -258,6 +258,6 @@ class GstReport(models.TransientModel):
         data['form']['used_context'] = dict(used_context, lang=self.env.context.get('lang', 'en_US'))
         report_obj = self.env['account.tax.report'].browse(data['form']['account_report_id'][0])
         if report_obj.type == 'detailed_report':
-            return self.env['report'].get_action(self, 'ia_au_gst_report.report_tax_gst_code_wise', data=data)
+            return self.env['report'].get_action(self, 'ia_au_gst_reporting.report_tax_gst_code_wise', data=data)
         else:
-            return self.env['report'].get_action(self, 'ia_au_gst_report.report_tax_gst', data=data)
+            return self.env['report'].get_action(self, 'ia_au_gst_reporting.report_tax_gst', data=data)

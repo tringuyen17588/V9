@@ -16,6 +16,7 @@
 		<field name="name">GST on Sales and other Outputs</field>
 		<field name="type">account_type</field>
 		<field name="parent_id" ref="net_gst_to_paid_or_reclaimed"/>
+		<field name="display_detail">detail_with_hierarchy</field>
 		<field name="tax_ids" eval="[(6, 0, [ref('gst_taxable_sale'),ref('gst_taxable_sale_incl'),ref('export_sales'),
 		ref('gst_free_sales'),ref('input_taxed_sales')])]"/>
 	</record>
@@ -24,6 +25,7 @@
 		<field name="name">GST Reclaimed on Purchases and other Inputs</field>
 		<field name="type">account_type</field>
 		<field name="parent_id" ref="net_gst_to_paid_or_reclaimed"/>
+		<field name="display_detail">detail_with_hierarchy</field>
 		<field name="tax_ids" eval="[(6, 0, [ref('non_capital_purchase'),ref('non_capital_purchase_incl'),
 		ref('capital_purchase'),ref('input_taxed_purchases'), ref('non_taxable_importations'),
 		ref('gst_imported_goods'),ref('gst_not_registered'),ref('no_abn_withholding'),
@@ -36,6 +38,7 @@
 		<field name="name">GST on Purchases (1B)</field>
 		<field name="type">account_type</field>
 		<field name="parent_id" ref="gst_report_root"/>
+		<field name="display_detail">detail_with_hierarchy</field>
 		<field name="tax_ids" eval="[(6, 0, [ref('capital_purchase'),ref('input_taxed_purchases'), ref('non_taxable_importations'),ref('gst_imported_goods'),ref('gst_not_registered'),ref('no_abn_withholding'),ref('voluntary_withholdings'),ref('luxury_car_tax'),ref('private_use'),ref('wet_applicable_purchases'),
 		ref('gst_wine_equivalent_tax'),ref('combined_wet_and_wgst'),ref('combined_cellar_door'),
 		ref('cellar_door_gst'),ref('cellar_door_wet')])]"/>
@@ -45,6 +48,7 @@
 		<field name="name">GST on Sales (1A)</field>
 		<field name="type">account_type</field>
 		<field name="parent_id" ref="gst_report_root"/>
+		<field name="display_detail">detail_with_hierarchy</field>
 		<field name="tax_ids" eval="[(6, 0, [ref('gst_taxable_sale'),ref('gst_taxable_sale_incl'),ref('export_sales'),
 		ref('gst_free_sales'),ref('input_taxed_sales')])]"/>
 	</record>
@@ -53,6 +57,7 @@
 		<field name="name">Total Value of Sales ex GST (G1)</field>
 		<field name="type">account_type</field>
 		<field name="parent_id" ref="gst_report_root"/>
+		<field name="display_detail">detail_with_hierarchy</field>
 		<field name="tax_ids" eval="[(6, 0, [ref('gst_taxable_sale'),ref('gst_taxable_sale_incl'),ref('export_sales'),
 		ref('gst_free_sales'),ref('input_taxed_sales')])]"/>
 	</record>
@@ -61,6 +66,7 @@
 		<field name="name">Export Sales (G2)</field>
 		<field name="type">account_type</field>
 		<field name="parent_id" ref="gst_report_root"/>
+		<field name="display_detail">detail_with_hierarchy</field>
 		<field name="tax_ids" eval="[(6, 0, [ref('export_sales')])]"/>
 	</record>
 	
@@ -68,6 +74,7 @@
 		<field name="name">Other GST free Sales (G3)</field>
 		<field name="type">account_type</field>
 		<field name="parent_id" ref="gst_report_root"/>
+		<field name="display_detail">detail_with_hierarchy</field>
 		<field name="tax_ids" eval="[(6, 0, [ref('gst_taxable_sale'),ref('gst_taxable_sale_incl'),
 		ref('gst_free_sales'),ref('input_taxed_sales')])]"/>
 	</record>
@@ -76,6 +83,7 @@
 		<field name="name">Capital Purchases (G10)</field>
 		<field name="type">account_type</field>
 		<field name="parent_id" ref="gst_report_root"/>
+		<field name="display_detail">detail_with_hierarchy</field>
 		<field name="tax_ids" eval="[(6, 0, [ref('capital_purchase')])]"/>
 	</record>
 	
@@ -83,6 +91,7 @@
 		<field name="name">Non Capital Purchases (G11)</field>
 		<field name="type">account_type</field>
 		<field name="parent_id" ref="gst_report_root"/>
+		<field name="display_detail">detail_with_hierarchy</field>
 		<field name="tax_ids" eval="[(6, 0, [ref('non_capital_purchase'),ref('non_capital_purchase_incl')])]"/>
 	</record>
 	
@@ -90,6 +99,7 @@
 		<field name="name">GST on Sales (1A)</field>
 		<field name="type">account_type</field>
 		<field name="parent_id" ref="gst_report_root"/>
+		<field name="display_detail">detail_with_hierarchy</field>		
 		<field name="tax_ids" eval="[(6, 0, [ref('gst_taxable_sale'),ref('gst_taxable_sale_incl'),ref('export_sales'),
 		ref('gst_free_sales'),ref('input_taxed_sales')])]"/>
 	</record>
@@ -98,6 +108,7 @@
 		<field name="name">Detailed GST Tax Report</field>
 		<field name="type">detailed_report</field>
 		<field name="parent_id" eval="False"/>
+		<field name="display_detail">detail_with_hierarchy</field>		
 		<field name="tax_ids" eval="[(6, 0, [ref('gst_taxable_sale'),ref('gst_taxable_sale_incl'),ref('export_sales'),
 		ref('gst_free_sales'),ref('input_taxed_sales'),ref('non_capital_purchase'),ref('non_capital_purchase_incl'),
 		ref('capital_purchase'),ref('input_taxed_purchases'), ref('non_taxable_importations'),
