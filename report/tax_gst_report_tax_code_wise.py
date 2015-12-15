@@ -55,8 +55,8 @@ class report_tax_gst_code_wise(models.AbstractModel):
         vendor_invoices = account_invoice_env.search(vendor_invoice_domain)
         vendor_refund_invoices = account_invoice_env.search(vendor_invoice_refund_domain)
 
-        select_clause = 'select account_invoice_tax.tax_id , sum(account_invoice_tax.amount) as tax_amount,'\
-                        'sum(account_invoice_tax.line_total_tax_excluded) as invoice_amount '\
+        select_clause = 'select account_invoice_tax.tax_id , COALESCE(SUM(account_invoice_tax.amount), 0) as tax_amount,'\
+                        ' COALESCE(SUM(account_invoice_tax.line_total_tax_excluded), 0) as invoice_amount '\
                         'from account_invoice_tax, account_invoice'
 
         if customer_invoices and sale_taxes:
@@ -144,8 +144,8 @@ class report_tax_gst_code_wise(models.AbstractModel):
                         tax_wise_data['taxed_amount'] = record['tax_amount'] - data['tax_amount']\
                             if data['tax_id'] == record['tax_id'] else record['tax_amount']
                 else:
-                    tax_wise_data['amount_untaxed'] = record['invoice_amount']
-                    tax_wise_data['taxed_amount'] = record['tax_amount']
+                    tax_wise_data['amount_untaxed'] = record.get('invoice_amount', 0.0)
+                    tax_wise_data['taxed_amount'] = record.get('tax_amount', 0.0)
                 tax_wise_data_list_purchase.append(tax_wise_data)
             res.update({'Purchase': tax_wise_data_list_purchase})
         if not res.get('Sale') and not res.get('Purchase'):
