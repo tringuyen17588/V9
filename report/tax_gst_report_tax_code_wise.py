@@ -6,7 +6,7 @@ from openerp.exceptions import Warning
 
 
 class report_tax_gst_code_wise(models.AbstractModel):
-    _name = 'report.ia_au_gst_report.report_tax_gst_code_wise'
+    _name = 'report.ia_au_gst_reporting.report_tax_gst_code_wise'
 
     def get_tax_lines(self, data):
         domain = []
@@ -188,4 +188,4 @@ class report_tax_gst_code_wise(models.AbstractModel):
             'sale_totals': sale_totals,
             'purchase_totals': purchase_totals
         }
-        return self.env['report'].render('ia_au_gst_report.report_tax_gst_code_wise', docargs)
+        return self.env['report'].render('ia_au_gst_reporting.report_tax_gst_code_wise', docargs)

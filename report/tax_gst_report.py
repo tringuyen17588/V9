@@ -6,7 +6,7 @@ from openerp.exceptions import Warning
 
 
 class report_tax_gst(models.AbstractModel):
-    _name = 'report.ia_au_gst_report.report_tax_gst'
+    _name = 'report.ia_au_gst_reporting.report_tax_gst'
     
     def get_tax_lines(self, data):
         domain = []
@@ -101,7 +101,8 @@ class report_tax_gst(models.AbstractModel):
                 res2 = self._compute_report_balance(report.children_ids)
                 for key, value in res2.items():
                     for field in fields:
-                        res[report.id][field] += value[field]
+                        report_obj = self.env['account.tax.report'].browse(key)
+                        res[report.id][field] += value[field] * report_obj.sign
         return res
     
     def get_account_lines(self, data):
@@ -113,7 +114,7 @@ class report_tax_gst(models.AbstractModel):
         for report in child_reports:
             vals = {
                 'name': report.name,
-                'tax_amount': res[report.id]['tax_amount'] * report.sign,
+                'tax_amount': res[report.id]['tax_amount'],
                 'type': 'report',
                 'level': bool(report.style_overwrite) and report.style_overwrite or report.level,
                 'account_type': report.type or False, #used to underline the financial report balances
@@ -131,7 +132,7 @@ class report_tax_gst(models.AbstractModel):
                     tax = self.env['account.tax'].browse(tax_id)
                     vals = {
                         'name': tax.name,
-                        'tax_amount': value['tax_amount'] * report.sign or 0.0,
+                        'tax_amount': value['tax_amount'] or 0.0,
                         'type': 'tax',
                         'level': report.display_detail == 'detail_with_hierarchy' and 4,
                         'tax_type': tax.type_tax_use,
@@ -157,4 +158,4 @@ class report_tax_gst(models.AbstractModel):
             'Date': fields.date.today(),
             'get_tax_lines': tax_lines,
         }
-        return self.env['report'].render('ia_au_gst_report.report_tax_gst', docargs)
+        return self.env['report'].render('ia_au_gst_reporting.report_tax_gst', docargs)

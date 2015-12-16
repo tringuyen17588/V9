@@ -1,181 +1,182 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<odoo>
-	
-	<record id="gst_taxable_sale" model="account.tax">
-		<field name="name">GST Taxable Sale</field>
-		<field name="description">GST Taxable Sale (10%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">10</field>
-		<field name="type_tax_use">sale</field>
-	</record>
-	
-	<record id="gst_taxable_sale_incl" model="account.tax">
-		<field name="name">GST Taxable Sale Incl</field>
-		<field name="description">GST Taxable Sale Incl (10%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">10</field>
-		<field name="price_include" eval="True"/>
-		<field name="type_tax_use">sale</field>
-	</record>
-	
-	<record id="export_sales" model="account.tax">
-		<field name="name">Export Sales</field>
-		<field name="description">Export Sales (0%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">0</field>
-		<field name="type_tax_use">sale</field>
-	</record>
-	
-	<record id="gst_free_sales" model="account.tax">
-		<field name="name">GST Free Sales</field>
-		<field name="description">GST Free Sales (0%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">0</field>
-		<field name="type_tax_use">sale</field>
-	</record>
-	
-	<record id="input_taxed_sales" model="account.tax">
-		<field name="name">Input Taxed Sales</field>
-		<field name="description">Input Taxed Sales (0%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">0</field>
-		<field name="type_tax_use">sale</field>
-	</record>
-	
-	<record id="non_capital_purchase" model="account.tax">
-		<field name="name">Non Capital Purchase</field>
-		<field name="description">Non Capital Purchase (10%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">10</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="non_capital_purchase_incl" model="account.tax">
-		<field name="name">Non Capital Purchase Incl</field>
-		<field name="description">Non Capital Purchase Including (10%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">10</field>
-		<field name="type_tax_use">purchase</field>
-		<field name="price_include" eval="True"/>
-	</record>
-	
-	<record id="capital_purchase" model="account.tax">
-		<field name="name">Capital Purchase</field>
-		<field name="description">Capital Purchase (10%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">10</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="input_taxed_purchases" model="account.tax">
-		<field name="name">Input Taxed Purchases</field>
-		<field name="description">Input Taxed Purchases (0%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">0</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="non_taxable_importations" model="account.tax">
-		<field name="name">Non Taxable Importations</field>
-		<field name="description">Non Taxable Importations (0%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">0</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="gst_imported_goods" model="account.tax">
-		<field name="name">GST Imported Goods</field>
-		<field name="description">GST Imported Goods (10%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">0</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="gst_not_registered" model="account.tax">
-		<field name="name">GST Not Registered</field>
-		<field name="description">GST Not Registered (0%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">0</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="no_abn_withholding" model="account.tax">
-		<field name="name">No ABN Withholding</field>
-		<field name="description">No ABN Withholding (49%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">49</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="voluntary_withholdings" model="account.tax">
-		<field name="name">Voluntary Withholdings</field>
-		<field name="description">Voluntary Withholdings (20%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">20</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="luxury_car_tax" model="account.tax">
-		<field name="name">Luxury Car Tax</field>
-		<field name="description">Luxury Car Tax (~%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">0</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="private_use" model="account.tax">
-		<field name="name">Private Use</field>
-		<field name="description">Private Use (0%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">0</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="wet_applicable_purchases" model="account.tax">
-		<field name="name">WET applicable purchases</field>
-		<field name="description">WET applicable purchases (29%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">29</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="gst_wine_equivalent_tax" model="account.tax">
-		<field name="name">GST Wine Equivalent Tax</field>
-		<field name="description">GST Wine Equivalent Tax (12.9%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">12.9</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="combined_wet_and_wgst" model="account.tax">
-		<field name="name">Combined WET and WGST</field>
-		<field name="description">Combined WET and WGST (41.9%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">41.9</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="combined_cellar_door" model="account.tax">
-		<field name="name">Combined Cellar Door</field>
-		<field name="description">Combined Cellar Door (30.87448%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">30.87448</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="cellar_door_gst" model="account.tax">
-		<field name="name">Cellar Door GST</field>
-		<field name="description">Cellar Door GST (11.8976%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">11.8976</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
-	
-	<record id="cellar_door_wet" model="account.tax">
-		<field name="name">Cellar Door WET</field>
-		<field name="description">Cellar Door WET (18.97696%)</field>
-		<field name="amount_type">percent</field>
-		<field name="amount">18.97696</field>
-		<field name="type_tax_use">purchase</field>
-	</record>
+<odoo >
+	<data noupdate="1">
+		<record id="gst_taxable_sale" model="account.tax">
+			<field name="name">GST Taxable Sale</field>
+			<field name="description">GST Taxable Sale (10%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">10</field>
+			<field name="type_tax_use">sale</field>
+		</record>
+		
+		<record id="gst_taxable_sale_incl" model="account.tax">
+			<field name="name">GST Taxable Sale Incl</field>
+			<field name="description">GST Taxable Sale Incl (10%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">10</field>
+			<field name="price_include" eval="True"/>
+			<field name="type_tax_use">sale</field>
+		</record>
+		
+		<record id="export_sales" model="account.tax">
+			<field name="name">Export Sales</field>
+			<field name="description">Export Sales (0%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">0</field>
+			<field name="type_tax_use">sale</field>
+		</record>
+		
+		<record id="gst_free_sales" model="account.tax">
+			<field name="name">GST Free Sales</field>
+			<field name="description">GST Free Sales (0%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">0</field>
+			<field name="type_tax_use">sale</field>
+		</record>
+		
+		<record id="input_taxed_sales" model="account.tax">
+			<field name="name">Input Taxed Sales</field>
+			<field name="description">Input Taxed Sales (0%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">0</field>
+			<field name="type_tax_use">sale</field>
+		</record>
+		
+		<record id="non_capital_purchase" model="account.tax">
+			<field name="name">Non Capital Purchase</field>
+			<field name="description">Non Capital Purchase (10%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">10</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="non_capital_purchase_incl" model="account.tax">
+			<field name="name">Non Capital Purchase Incl</field>
+			<field name="description">Non Capital Purchase Including (10%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">10</field>
+			<field name="type_tax_use">purchase</field>
+			<field name="price_include" eval="True"/>
+		</record>
+		
+		<record id="capital_purchase" model="account.tax">
+			<field name="name">Capital Purchase</field>
+			<field name="description">Capital Purchase (10%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">10</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="input_taxed_purchases" model="account.tax">
+			<field name="name">Input Taxed Purchases</field>
+			<field name="description">Input Taxed Purchases (0%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">0</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="non_taxable_importations" model="account.tax">
+			<field name="name">Non Taxable Importations</field>
+			<field name="description">Non Taxable Importations (0%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">0</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="gst_imported_goods" model="account.tax">
+			<field name="name">GST Imported Goods</field>
+			<field name="description">GST Imported Goods (10%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">0</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="gst_not_registered" model="account.tax">
+			<field name="name">GST Not Registered</field>
+			<field name="description">GST Not Registered (0%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">0</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="no_abn_withholding" model="account.tax">
+			<field name="name">No ABN Withholding</field>
+			<field name="description">No ABN Withholding (49%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">49</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="voluntary_withholdings" model="account.tax">
+			<field name="name">Voluntary Withholdings</field>
+			<field name="description">Voluntary Withholdings (20%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">20</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="luxury_car_tax" model="account.tax">
+			<field name="name">Luxury Car Tax</field>
+			<field name="description">Luxury Car Tax (~%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">0</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="private_use" model="account.tax">
+			<field name="name">Private Use</field>
+			<field name="description">Private Use (0%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">0</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="wet_applicable_purchases" model="account.tax">
+			<field name="name">WET applicable purchases</field>
+			<field name="description">WET applicable purchases (29%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">29</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="gst_wine_equivalent_tax" model="account.tax">
+			<field name="name">GST Wine Equivalent Tax</field>
+			<field name="description">GST Wine Equivalent Tax (12.9%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">12.9</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="combined_wet_and_wgst" model="account.tax">
+			<field name="name">Combined WET and WGST</field>
+			<field name="description">Combined WET and WGST (41.9%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">41.9</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="combined_cellar_door" model="account.tax">
+			<field name="name">Combined Cellar Door</field>
+			<field name="description">Combined Cellar Door (30.87448%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">30.87448</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="cellar_door_gst" model="account.tax">
+			<field name="name">Cellar Door GST</field>
+			<field name="description">Cellar Door GST (11.8976%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">11.8976</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+		
+		<record id="cellar_door_wet" model="account.tax">
+			<field name="name">Cellar Door WET</field>
+			<field name="description">Cellar Door WET (18.97696%)</field>
+			<field name="amount_type">percent</field>
+			<field name="amount">18.97696</field>
+			<field name="type_tax_use">purchase</field>
+		</record>
+	</data>
 </odoo>

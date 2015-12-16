@@ -5,11 +5,11 @@
 
         <report 
             id="action_report_gst"
-             model="gst.report"
+            model="gst.report"
             string="GST report"
             report_type="qweb-pdf"
-            name="ia_au_gst_report.report_tax_gst"
-            file="ia_au_gst_report.report_tax_gst"
+            name="ia_au_gst_reporting.report_tax_gst"
+            file="ia_au_gst_reporting.report_tax_gst"
             />
 		
             	
@@ -18,8 +18,8 @@
             model="gst.report"
             string="GST Details report"
             report_type="qweb-pdf"
-             name="ia_au_gst_report.report_tax_gst_code_wise"
-            file="ia_au_gst_report.report_tax_gst_code_wise"
+             name="ia_au_gst_reporting.report_tax_gst_code_wise"
+            file="ia_au_gst_reporting.report_tax_gst_code_wise"
             />
     </data>
 </openerp>
