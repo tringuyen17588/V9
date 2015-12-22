@@ -7,7 +7,7 @@ from openerp.exceptions import Warning
 
 class report_tax_gst_code_wise(models.AbstractModel):
     _name = 'report.ia_au_gst_reporting.report_tax_gst_code_wise'
-
+    
     def get_tax_lines(self, data):
         domain = []
         tax_wise_data_list_sale = []
@@ -38,25 +38,26 @@ class report_tax_gst_code_wise(models.AbstractModel):
         domain.append(('state', 'in', ['open', 'paid']))
 
         #    Calculation of Sales Tax
-        customer_invoice_domain = domain + [('type', '=', 'out_invoice'),
-                                            ('tax_line_ids', '!=', False)]
-        customer_invoice_refund_domain = domain + [('type', '=', 'out_refund'),
-                                                   ('tax_line_ids', '!=', False)]
+        customer_invoice_domain = domain + [('type', '=', 'out_invoice')]
+        customer_invoice_refund_domain = domain + [('type', '=', 'out_refund')]
         customer_invoices = account_invoice_env.search(customer_invoice_domain)
         customer_refund_invoices = account_invoice_env.search(customer_invoice_refund_domain)
 
         #    Calculation of Purchase Tax
-        purchase_taxes = account_tax_env.search([('company_id', '=', data['company_id'][0]),
-                                                 ('type_tax_use', '=', 'purchase')])
-        vendor_invoice_domain = domain + [('type', '=', 'in_invoice'),
-                                          ('tax_line_ids', '!=', False)]
-        vendor_invoice_refund_domain = domain + [('type', '=', 'in_refund'),
-                                                ('tax_line_ids', '!=', False)]
+        if report_tax_ids:
+            purchase_taxes = account_tax_env.search([('company_id', '=', data['company_id'][0]),
+                                                     ('type_tax_use', '=', 'purchase'),
+                                                     ('id', 'in', tuple(report_tax_ids))])
+        else:
+            purchase_taxes = account_tax_env.search([('company_id', '=', data['company_id'][0]),
+                                                     ('type_tax_use', '=', 'purchase')])
+        vendor_invoice_domain = domain + [('type', '=', 'in_invoice')]
+        vendor_invoice_refund_domain = domain + [('type', '=', 'in_refund')]
         vendor_invoices = account_invoice_env.search(vendor_invoice_domain)
         vendor_refund_invoices = account_invoice_env.search(vendor_invoice_refund_domain)
 
         select_clause = 'select account_invoice_tax.tax_id , COALESCE(SUM(account_invoice_tax.amount), 0) as tax_amount,'\
-                        ' COALESCE(SUM(account_invoice_tax.line_total_tax_excluded), 0) as invoice_amount '\
+                        ' COALESCE(SUM(account_invoice.amount_untaxed), 0) as invoice_amount '\
                         'from account_invoice_tax, account_invoice'
 
         if customer_invoices and sale_taxes:
@@ -76,6 +77,24 @@ class report_tax_gst_code_wise(models.AbstractModel):
                              ' group by account_invoice_tax.tax_id '
                              )
             sale_result = self._cr.dictfetchall()
+            self._cr.execute("select tax_id, invoice_line_id from account_invoice_line_tax where tax_id not in "
+                             "(select account_invoice_tax.tax_id from account_invoice_tax,account_tax  "
+                             "where account_invoice_tax.tax_id in "+str(tuple(sale_taxes_ids))+")"
+                             " and tax_id in "+str(tuple(sale_taxes_ids)))
+            tax_code_from_invoice_lines = self._cr.dictfetchall()
+            for tax_code in tax_code_from_invoice_lines:
+                line = {}
+                self._cr.execute("Select COALESCE(sum(price_subtotal),0.0) from account_invoice_line,"
+                                 "account_invoice_line_tax where "
+                                 "account_invoice_line.id=account_invoice_line_tax.invoice_line_id"
+                                 " and account_invoice_line_tax.tax_id="+str(tax_code.get('tax_id')))
+                invoice_line_total = self._cr.fetchone()
+                tax = self.env['account.tax'].browse(tax_code.get('tax_id'))
+                line.update({'amount_untaxed': invoice_line_total[0],
+                             'tax_code': tax.name,
+                             'tax_description': tax.description,
+                             'taxed_amount': 0.0})
+                tax_wise_data_list_sale.append(line)
             if customer_refund_invoices:
                 customer_refund_invoice_ids = customer_refund_invoices.ids
                 if len(customer_refund_invoice_ids) == 1:
@@ -121,6 +140,24 @@ class report_tax_gst_code_wise(models.AbstractModel):
                              ' group by account_invoice_tax.tax_id '
                              )
             purchase_result = self._cr.dictfetchall()
+            self._cr.execute("select tax_id, invoice_line_id from account_invoice_line_tax where tax_id not in "
+                             "(select account_invoice_tax.tax_id from account_invoice_tax,account_tax  "
+                             "where account_invoice_tax.tax_id in "+str(tuple(purchase_taxes_ids))+")"
+                             " and tax_id in "+str(tuple(purchase_taxes_ids)))
+            tax_code_from_invoice_lines = self._cr.dictfetchall()
+            for tax_code in tax_code_from_invoice_lines:
+                line = {}
+                self._cr.execute("Select COALESCE(sum(price_subtotal),0.0) from account_invoice_line,"
+                                 "account_invoice_line_tax where "
+                                 "account_invoice_line.id=account_invoice_line_tax.invoice_line_id"
+                                 " and account_invoice_line_tax.tax_id="+str(tax_code.get('tax_id')))
+                invoice_line_total = self._cr.fetchone()
+                tax = self.env['account.tax'].browse(tax_code.get('tax_id'))
+                line.update({'amount_untaxed': invoice_line_total[0],
+                             'tax_code': tax.name,
+                             'tax_description': tax.description,
+                             'taxed_amount': 0.0})
+                tax_wise_data_list_purchase.append(line)
             if vendor_refund_invoices:
                 vendor_refund_invoice_ids = vendor_refund_invoices.ids
                 if len(customer_refund_invoice_ids) == 1:
@@ -170,7 +207,7 @@ class report_tax_gst_code_wise(models.AbstractModel):
             sale_tax_total += val.get('taxed_amount', 0.0)
         sale_totals['sale_untaxed_total'] = sale_untaxed_total
         sale_totals['sale_tax_total'] = sale_tax_total
-        
+
         for rec in purchase_tax_lines:
             purchase_untaxed_total += rec.get('amount_untaxed', 0.0)
             purchase_tax_total += rec.get('taxed_amount', 0.0)
