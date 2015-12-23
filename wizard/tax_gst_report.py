@@ -11,7 +11,7 @@ from openerp.exceptions import Warning
 class GstReport(models.TransientModel):
     _name = 'gst.report'
     _description = "GST Report"
-    
+
     period_select = fields.Selection(string='Select Period',
                                      selection=[('tax_quarter_1', 'Tax Quarter 1'),
                                                 ('tax_quarter_2', 'Tax Quarter 2'),
@@ -36,7 +36,7 @@ class GstReport(models.TransientModel):
                                                 ('last_tax_year', 'Last Tax Year'),
                                                 ('custom', 'Custom')
                                                 ],
-                                     default='custom')
+                                     default='last_tax_year')
     date_from = fields.Date(string='Start Date')
     date_to = fields.Date(string='End Date')
     company_id = fields.Many2one('res.company', string='Company',
@@ -208,7 +208,7 @@ class GstReport(models.TransientModel):
                     elif self.period_select == 'this_tax_year_to_date':
                         self.date_from = first_day_date
                         self.date_to = date_today
-                    
+
                     elif self.period_select == 'last_tax_quarter':
                         for q_no, months in quarter_allocation.iteritems():
                             m_list = []
