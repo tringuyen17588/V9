@@ -3,9 +3,13 @@
 from openerp import models, fields, api
 import datetime
 from calendar import monthrange
-from isoweek import Week
-from dateutil.relativedelta import relativedelta
 from openerp.exceptions import Warning
+try:
+    from isoweek import Week
+except ImportError:
+    raise Warning('This module has dependency on python-isoweek module!\n You can install this module using command - sudo pip install isoweek')
+
+from dateutil.relativedelta import relativedelta
 
 
 class GstReport(models.TransientModel):
