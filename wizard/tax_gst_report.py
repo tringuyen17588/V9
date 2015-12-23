@@ -12,6 +12,14 @@ class GstReport(models.TransientModel):
     _name = 'gst.report'
     _description = "GST Report"
 
+    @api.multi
+    def _get_report_id(self):
+        reports_on_wizard = self.env['account.tax.report'].search([('parent_id', '=',
+                                                          False)])
+        reports_of_view_type = self.env['account.tax.report'].search([('id', 'in', reports_on_wizard.ids),
+                                                                      ('type', '=', 'sum')], limit=1, order='sequence asc')
+        return reports_of_view_type.id
+
     period_select = fields.Selection(string='Select Period',
                                      selection=[('tax_quarter_1', 'Tax Quarter 1'),
                                                 ('tax_quarter_2', 'Tax Quarter 2'),
@@ -41,7 +49,9 @@ class GstReport(models.TransientModel):
     date_to = fields.Date(string='End Date')
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env['res.users'].browse(self._uid).company_id)
-    account_report_id = fields.Many2one('account.tax.report', string='Tax Reports', required=True)
+    account_report_id = fields.Many2one('account.tax.report',
+                                        string='Tax Reports', required=True,
+                                        default=_get_report_id)
 
     @api.onchange('period_select')
     def onchange_period_select(self):
@@ -253,7 +263,7 @@ class GstReport(models.TransientModel):
         data = {}
         data['ids'] = self.env.context.get('active_ids', [])
         data['model'] = self.env.context.get('active_model', 'ir.ui.menu')
-        data['form'] = self.read(['date_from', 'date_to','company_id','account_tax_id','account_report_id'])[0]
+        data['form'] = self.read(['date_from', 'date_to', 'company_id','account_tax_id','account_report_id'])[0]
         used_context = self._build_contexts(data)
         data['form']['used_context'] = dict(used_context, lang=self.env.context.get('lang', 'en_US'))
         report_obj = self.env['account.tax.report'].browse(data['form']['account_report_id'][0])
