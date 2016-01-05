@@ -16,7 +16,7 @@
   Similarly to Financial Reports configuration, if there is a set of custom Tax Codes, you will need to appropriately define the Tax Report lines in the module
   prior to install
 * Dependencies
-  - isoweek python module
+  -- isoweek python module
 * Database configuration
 * How to run tests
 * Deployment instructions
