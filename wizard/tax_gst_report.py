@@ -7,7 +7,7 @@ from openerp.exceptions import Warning
 try:
     from isoweek import Week
 except ImportError:
-    raise Warning('This module has dependency on python-isoweek module!\n You can install this module using command - sudo pip install isoweek')
+    raise Warning('This module has dependency on python-isoweek module!\n You can install this module using command -sudo pip install isoweek')
 
 from dateutil.relativedelta import relativedelta
 
@@ -71,8 +71,9 @@ class GstReport(models.TransientModel):
             current_week_sunday = Week(current_year, current_week_number).sunday()
             current_week_saturday = Week(current_year, current_week_number).saturday()
             next_saturday = Week(current_year, current_week_number + 1).saturday()
-            account_config = self.env['account.config.settings'].search([])
-            
+            account_config = self.env['account.config.settings'].search([],
+                                                            order='id desc',
+                                                            limit=1)
             if self.period_select == 'all_dates':
                 self.date_from = False
                 self.date_to = False
