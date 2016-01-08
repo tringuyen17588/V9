@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#Comment for commit
 {
     'name': 'Australian GST Reporting',
     'version': '1.0',
@@ -23,7 +22,8 @@ Generate Reports based on Tax Codes
              'views/tax_gst_report_view.xml',
              'wizard/tax_gst_report_view.xml',
              'views/account_invoice_tax_view.xml',
-             'views/tax_report_hierarchy_view.xml'
+             'views/tax_report_hierarchy_view.xml',
+             'views/tax_gst_report_detailed_journal_wise.xml'
              ],
     'qweb': [],
     'installable': True,

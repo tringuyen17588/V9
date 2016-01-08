@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-<template id="report_tax_gst_code_wise">
+	
+<template id="tax_gst_report_detailed">
     <t t-call="report.html_container">
         <t t-foreach="docs" t-as="o">
             <t t-call="report.internal_layout">
@@ -18,7 +19,7 @@
 							</center>
 						</h3>
 					</div>
-					<table t-if="sale_tax_lines" class="table table-condensed">
+					<table t-if="sale_tax_lines"  class="table table-condensed">
                     <thead>
                     	<tr>
                     		<th colspan="4">Sales</th>
