@@ -7,13 +7,15 @@
             <field name="model">account.tax.report</field>
             <field name="arch" type="xml">
                 <form string="Tax Report">
+                	<button string="Compute" type="object" name="compute_taxed_amount"/>
                     <group col="4">
                         <field name="name"/>
-                        <field name="parent_id"/>
+                        <field name="parent_id" context="{'compute': True}"/>
                         <field name="sequence"/>
                         <field name="type"/>
                         <field name="sign"/>
                         <field name="style_overwrite"/>
+						<field name="amount_taxed"/>                        
                     </group>
                     <notebook attrs="{'invisible': [('type','not in',['accounts','account_type', 'account_report','detailed_report'])]}">
                         <page string="Report">
@@ -77,24 +79,70 @@
             <field name="model">account.tax.report</field>
             <field name="field_parent">children_ids</field>
             <field name="arch" type="xml">
-                <tree string="Tax Reports Hierarchy">
+                <tree string="Tax Reports Hierarchy" >
                     <field name="name"/>
                     <field name="type"/>
+					<field name="amount_tax_exclusive"/>
+					<field name="amount_taxed"/>                    
                     <field name="parent_id" invisible="1"/>
-                    <field name="account_report_id"/>
                 </tree>
             </field>
         </record>
-
-        <record id="action_tax_report_tree_hierarchy" model="ir.actions.act_window">
+        
+        <record id="view_tax_hierarchy_without_balances" model="ir.ui.view">
+            <field name="name">tax.report.hierarchy.without.balance</field>
+            <field name="model">account.tax.report</field>
+            <field name="field_parent">children_ids</field>
+            <field name="arch" type="xml">
+                <tree string="Tax Reports Hierarchy" >
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="parent_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+		
+         <record id="action_tax_report_tree_hierarchy_without_balance" model="ir.actions.act_window">
             <field name="name">Tax Reports Hierarchy</field>
             <field name="res_model">account.tax.report</field>
             <field name="view_type">tree</field>
-            <field name="view_id" ref="view_tax_report_tree_hierarchy"/>
+            <field name="view_id" ref="view_tax_hierarchy_without_balances"/>
             <field name="domain">[('parent_id','=',False)]</field>
         </record>
         
+        <record id="action_tax_report_tree_hierarchy" model="ir.actions.act_window">
+            <field name="name">Tax Balances</field>
+            <field name="res_model">account.tax.report</field>
+            <field name="view_type">tree</field>
+            <field name="view_id" ref="view_tax_report_tree_hierarchy"/>
+            <field name="domain">[('parent_id','=',False),('type','=','sum')]</field>
+            <field name="context">{'show_button': True}</field>
+        </record>
         
+        <record id="view_account_tax_tree" model="ir.ui.view">
+			<field name="name">view.account.tax.tree</field>
+			<field name="model">account.tax</field>
+			<field name="arch" type="xml">
+				<tree string="Tax Codes">
+	                <field name="name"/>
+	                <field name="type_tax_use"/>
+	                <field name="description" string="Short Name"/>
+	            	<field name="invoiced_amount"/>
+	            	<field name="taxed_amount" string="Taxed Amount"/>		
+				</tree>
+			</field>		
+		</record>
+        
+      	<act_window id="action_account_tax_line_open"
+        	name="Taxes"
+        	res_model="account.tax"
+        	src_model="account.tax.report"
+  			key2="tree_but_open"
+			view_mode="tree"
+      		view_type="tree"
+	     	view_id="ia_au_gst_reporting.view_account_tax_tree"     	
+      		context="{'report_id': active_id, 'show_button':True}"/>
+              
         <record id="view_account_account_tag_form" model="ir.ui.view">
             <field name="name">account.tag.form</field>
             <field name="model">account.account.tag</field>
@@ -112,7 +160,8 @@
             </field>
         </record>
         
-        <menuitem id="menu_tax_report_tree_hierarchy" name="Tax Reports Hierarchy" parent="menu_tax_reports" action="action_tax_report_tree_hierarchy"/>
+        <menuitem id="menu_tax_report_tree_hierarchy" name="Tax Reports Hierarchy" parent="menu_tax_reports" action="action_tax_report_tree_hierarchy_without_balance"/>
+        <menuitem id="menu_tax_report_tree_hierarchy_with_balance" name="Tax Reports Balances" parent="menu_tax_reports" action="action_tax_report_tree_hierarchy"/>
         
             <record id="action_tax_tags" model="ir.actions.act_window">
             <field name="name">Tax Groups</field>
