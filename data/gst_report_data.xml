@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-	
+	<data noupdate="1">
 	<record id="gst_report_root" model="account.tax.report">
 		<field name="name">GST Report</field>
 		<field name="type">sum</field>
@@ -117,4 +117,5 @@
 		ref('gst_wine_equivalent_tax'),ref('combined_wet_and_wgst'),ref('combined_cellar_door'),
 		 ref('cellar_door_gst'),ref('cellar_door_wet')])]"/>
 	</record>
+	</data>
 </odoo>

@@ -91,8 +91,10 @@ class tax_gst_report_detailed(models.AbstractModel):
                 for tax_code in tax_code_from_invoice_lines:
                     line = {}
                     self._cr.execute("Select COALESCE(sum(price_subtotal),0.0) from account_invoice_line,"
-                                     "account_invoice_line_tax where "
+                                     "account_invoice_line_tax, account_invoice where "
                                      "account_invoice_line.id=account_invoice_line_tax.invoice_line_id"
+                                     " and account_invoice.state in ('open', 'paid') "
+                                     "and account_invoice_line.invoice_id=account_invoice.id"
                                      " and account_invoice_line_tax.tax_id="+str(tax_code.get('tax_id')))
                     invoice_line_total = self._cr.fetchone()
                     tax = self.env['account.tax'].browse(tax_code.get('tax_id'))
