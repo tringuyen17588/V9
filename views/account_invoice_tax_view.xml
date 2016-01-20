@@ -1,24 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-	<record id="account_invoice_tax_inherit" model="ir.ui.view">
-		<field name="name">invoice.form.inherit</field>
-		<field name="model">account.invoice</field>
-		<field name="inherit_id" ref="account.invoice_form"/>
+	
+	<record id="account_tax_inherit_view" model="ir.ui.view">
+		<field name="name">account.tax.inherit.view</field>
+		<field name="model">account.tax</field>
+		<field name="inherit_id" ref="account.view_tax_form"/>
 		<field name="arch" type="xml">
-			<xpath expr="//field[@name='tax_line_ids']/tree/field[@name='amount']" position="after">
-				<field name="line_total_tax_excluded" string="Line Total(Tax Exclusive)" invisible="1"/>
+			<xpath expr="//field[@name='type_tax_use']" position="after">
+				<field name="taxed_amount"/>
 			</xpath>
 		</field>		
 	</record>
 	
-	<record id="vendor_bills_tax_inherit" model="ir.ui.view">
-		<field name="name">vendor.bill.inherit</field>
-		<field name="model">account.invoice</field>
-		<field name="inherit_id" ref="account.invoice_supplier_form"/>
-		<field name="arch" type="xml">
-			<xpath expr="//field[@name='tax_line_ids']/tree/field[@name='amount']" position="after">
-				<field name="line_total_tax_excluded" string="Line Total(Tax Exclusive)" invisible="1"/>
-			</xpath>
-		</field>		
-	</record>
 </odoo>

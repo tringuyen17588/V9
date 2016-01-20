@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#Comment for commit
 {
     'name': 'Australian GST Reporting',
     'version': '1.0',
@@ -16,14 +15,17 @@ Generate Reports based on Tax Codes
     'sequence': 0,
     'demo': [],
     'test': [],
-    'data': ['data/account_tax_data.xml',
+    'data': ['ia_au_gst_reporting.xml',
+             'data/account_tax_data.xml',
              'data/gst_report_data.xml',
              'views/reports.xml',
              'views/tax_details_report_view.xml',
              'views/tax_gst_report_view.xml',
              'wizard/tax_gst_report_view.xml',
              'views/account_invoice_tax_view.xml',
-             'views/tax_report_hierarchy_view.xml'
+             'views/tax_report_hierarchy_view.xml',
+             'views/tax_gst_report_detailed_journal_wise.xml',
+             'wizard/tax_excel_report.xml'
              ],
     'qweb': [],
     'installable': True,

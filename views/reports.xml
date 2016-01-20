@@ -14,12 +14,22 @@
 		
             	
     	 <report 
-            id="action_report_detaild_gst"
+            id="action_report_detailed_gst"
             model="gst.report"
             string="GST Details report"
             report_type="qweb-pdf"
-             name="ia_au_gst_reporting.report_tax_gst_code_wise"
-            file="ia_au_gst_reporting.report_tax_gst_code_wise"
+             name="ia_au_gst_reporting.tax_gst_report_detailed"
+            file="ia_au_gst_reporting.tax_gst_report_detailed"
             />
+    	 
+		<report 
+	        id="action_report_detailed_gst_journal_wise"
+	        model="gst.report"
+	        string="GST Detailed Report Journal Wise"
+	        report_type="qweb-pdf"
+	         name="ia_au_gst_reporting.tax_gst_detailed_report_journal_wise"
+	        file="ia_au_gst_reporting.tax_gst_detailed_report_journal_wise"
+	        />
+            	
     </data>
 </openerp>

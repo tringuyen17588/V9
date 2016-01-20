@@ -7,57 +7,59 @@ from openerp.exceptions import Warning
 
 class report_tax_gst(models.AbstractModel):
     _name = 'report.ia_au_gst_reporting.report_tax_gst'
-    
-    def get_tax_lines(self, data):
-        domain = []
-        tax_wise_data_list_sale = []
-        tax_wise_data_list_purchase = []
-        sale_refund_result = {}
-        purchase_refund_result = {}
-        res = {'Purchase': [], 'Sale': []}
-        account_tax_env = self.env['account.tax']
-        account_invoice_env = self.env['account.invoice']
-        account_invoice_tax_env = self.env['account.invoice.tax']
-        sale_taxes = account_tax_env.search([('company_id', '=', data['company_id'][0]),
-                                              ('type_tax_use', '=', 'sale')])
 
-        if data['date_from']:
-            domain.append(('date_invoice', '>=', data['date_from']))
-        if data['date_to']:
-            domain.append(('date_invoice', '<=', data['date_to']))
-        if data['company_id']:
-            domain.append(('company_id', '=', data['company_id'][0]))
-        domain.append(('state', 'in', ['open', 'paid']))
-
-        #    Calculation of Sales Tax
-    
     def _compute_account_balance(self, tax_codes):
         """ compute the tax amount for the provided tax codes
         """
-        fields = ['tax_amount']
-        
-        
+        fields = ['tax_amount', 'invoiced_amount']
         context = self._context
         date_from = context.get('date_from',False)
         date_to = context.get('date_to',False)
-        
-        invoice_states = ['open','paid']
-        dates =  [date_from,date_to]
+
+        invoice_states = ['open', 'paid']
+        dates = [date_from, date_to]
         res = {}
+        res_inv = {}
         for tax in tax_codes:
             res[tax.id] = dict((field, 0.0) for field in fields)
         if tax_codes:
-            
-            request = "SELECT tax_id as id, COALESCE(SUM(amount), 0) as tax_amount FROM " \
-            "account_invoice as account_invoice_tax__invoice_id,account_invoice_tax " \
-            "WHERE tax_id IN %s  AND (account_invoice_tax.invoice_id=account_invoice_tax__invoice_id.id) AND " \
-            "(account_invoice_tax__invoice_id.state in %s) AND (account_invoice_tax__invoice_id.date_invoice >= %s) AND "\
-            "(account_invoice_tax__invoice_id.date_invoice <= %s) GROUP BY tax_id"
-            
-            params = (tuple(tax_codes._ids),) + (tuple(invoice_states),) + tuple(dates) 
+            invoice_line_query = "SELECT COALESCE(SUM(price_subtotal), 0) as "\
+                "invoiced_amount, account_invoice_line_tax.tax_id from account_invoice_line, account_invoice_line_tax where id in"\
+                " (select invoice_line_id from account_invoice_line_tax where"\
+                " tax_id IN %s) and account_invoice_line.id=account_invoice_line_tax.invoice_line_id"\
+                " GROUP BY account_invoice_line_tax.tax_id"
+            param = (tuple(tax_codes._ids),)
+            self.env.cr.execute(invoice_line_query, param)
+            for rw in self.env.cr.dictfetchall():
+                res_inv[rw['tax_id']] = rw
+            if False in dates:
+                request = "SELECT tax_id as id, COALESCE(SUM(amount), 0) as tax_amount FROM " \
+                    "account_invoice as account_invoice_tax__invoice_id,account_invoice_tax " \
+                    "WHERE tax_id IN %s  AND (account_invoice_tax.invoice_id=account_invoice_tax__invoice_id.id) AND " \
+                    "(account_invoice_tax__invoice_id.state in %s) GROUP BY tax_id"
+                params = (tuple(tax_codes._ids),) + (tuple(invoice_states),)
+            else:
+                request = "SELECT tax_id as id, COALESCE(SUM(amount), 0) as tax_amount FROM " \
+                    "account_invoice as account_invoice_tax__invoice_id,account_invoice_tax " \
+                    "WHERE tax_id IN %s  AND (account_invoice_tax.invoice_id=account_invoice_tax__invoice_id.id) AND " \
+                    "(account_invoice_tax__invoice_id.state in %s) AND (account_invoice_tax__invoice_id.date_invoice >= %s) AND "\
+                    "(account_invoice_tax__invoice_id.date_invoice <= %s) GROUP BY tax_id"
+
+                params = (tuple(tax_codes._ids),) + (tuple(invoice_states),) + tuple(dates) 
             self.env.cr.execute(request, params)
             for row in self.env.cr.dictfetchall():
                 res[row['id']] = row
+                if res_inv.get(row['id']):
+                    invoiced_amount = res_inv.get(row['id']).get('invoiced_amount')
+                    res[row['id']].update({'invoiced_amount': invoiced_amount})
+
+            for r_key in res_inv.keys():
+                if res.get(r_key):
+                    invoiced_amount = res_inv.get(r_key).get('invoiced_amount')
+                    if invoiced_amount != 0.0:
+                        existing_rec = res[r_key]
+                        existing_rec.update({'invoiced_amount': invoiced_amount})
+                        res.update({r_key: existing_rec})
         return res
 
     def _compute_report_balance(self, reports):
@@ -68,7 +70,7 @@ class report_tax_gst(models.AbstractModel):
                'account_report' : it's the amount of the related report
                'sum' : it's the sum of the children of this record (aka a 'view' record)'''
         res = {}
-        fields = ['tax_amount']
+        fields = ['tax_amount', 'invoiced_amount']
         for report in reports:
             if report.id in res:
                 continue
@@ -104,17 +106,17 @@ class report_tax_gst(models.AbstractModel):
                         report_obj = self.env['account.tax.report'].browse(key)
                         res[report.id][field] += value[field] * report_obj.sign
         return res
-    
+
     def get_account_lines(self, data):
         lines = []
         account_report = self.env['account.tax.report'].search([('id', '=', data['account_report_id'][0])])
         child_reports = account_report._get_children_by_order()
         res = self.with_context(data.get('used_context'))._compute_report_balance(child_reports)
-
         for report in child_reports:
             vals = {
                 'name': report.name,
                 'tax_amount': res[report.id]['tax_amount'],
+                'invoiced_amount': res[report.id]['invoiced_amount'],
                 'type': 'report',
                 'level': bool(report.style_overwrite) and report.style_overwrite or report.level,
                 'account_type': report.type or False, #used to underline the financial report balances
@@ -133,11 +135,12 @@ class report_tax_gst(models.AbstractModel):
                     vals = {
                         'name': tax.name,
                         'tax_amount': value['tax_amount'] or 0.0,
+                        'invoiced_amount': value['invoiced_amount'] or 0.0,
                         'type': 'tax',
                         'level': report.display_detail == 'detail_with_hierarchy' and 4,
                         'tax_type': tax.type_tax_use,
                     }
-                    if not tax.company_id.currency_id.is_zero(vals['tax_amount']):
+                    if not tax.company_id.currency_id.is_zero(vals['tax_amount']) or not tax.company_id.currency_id.is_zero(vals['invoiced_amount']):
                             flag = True
                     if flag:
                         lines.append(vals)
@@ -148,7 +151,6 @@ class report_tax_gst(models.AbstractModel):
         self.model = self.env.context.get('active_model')
         docs = self.env[self.model].browse(self.env.context.get('active_id'))
         tax_lines = self.get_account_lines(data.get('form'))
-        print tax_lines
         docargs = {
             'doc_ids': self.ids,
             'doc_model': self.model,
