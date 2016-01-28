@@ -29,6 +29,11 @@ class GstReport(models.TransientModel):
                                          order='sequence asc')
         return reports_of_view_type.id
 
+    @api.onchange('account_report_id')
+    def onchange_account_report_id(self):
+        if self.account_report_id:
+            self.account_report_type = self.account_report_id.type
+
     period_select = fields.Selection(string='Select Period',
                                      selection=[('tax_quarter_1',
                                                  'Tax Quarter 1'),
@@ -76,12 +81,22 @@ class GstReport(models.TransientModel):
     account_report_id = fields.Many2one('account.tax.report',
                                         string='Tax Reports', required=True,
                                         default=_get_report_id)
-    journal_wise = fields.Boolean(string='Print Journal Wise',
+    account_report_type = fields.Selection([('sum', 'View'),
+                                    ('accounts', 'Tax Group'),
+                                    ('account_type', 'Tax Code'),
+                                    ('account_report', 'Report Value'),
+                                    ('detailed_report',
+                                     'Detailed Report')
+                                    ],
+                                   string='Account Report Type',
+                                   default='sum')
+    journal_wise = fields.Boolean(string='Print Journal Lines',
                   help='Using this field you can Print Report Journal wise')
-#     show_invoice_line_wise = fields.Boolean(string='Show Invoice Lines')
 
     @api.onchange('period_select')
     def onchange_period_select(self):
+        if self.account_report_id:
+            self.account_report_type = self.account_report_id.type
         quarter_allocation = {1: [], 2: [], 3: [], 4: []}
         if self.period_select:
             date_today = datetime.date.today()
@@ -348,9 +363,10 @@ class GstReport(models.TransientModel):
         used_context = self._build_contexts(data)
         data['form']['used_context'] = dict(used_context,
                                     lang=self.env.context.get('lang', 'en_US'))
-        report_obj = self.env['account.tax.report'].browse(
-                                       data['form']['account_report_id'][0])
-        if report_obj.type == 'detailed_report':
+#         report_obj = self.env['account.tax.report'].browse(
+#                                        data['form']['account_report_id'][0])
+        if self.account_report_type == 'detailed_report':
+            print "self.journal_wise", self.journal_wise
             if self.journal_wise:
                 return self.env['report'].get_action(self,
                  'ia_au_gst_reporting.tax_gst_detailed_report_journal_wise',

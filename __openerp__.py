@@ -15,9 +15,7 @@ Generate Reports based on Tax Codes
     'sequence': 0,
     'demo': [],
     'test': [],
-    'data': [
-#              'ia_au_gst_reporting.xml',
-             #'data/account_tax_data.xml',
+    'data': ['ia_au_gst_reporting.xml',
              'data/gst_report_data.xml',
              'views/reports.xml',
              'views/tax_details_report_view.xml',
