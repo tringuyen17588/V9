@@ -25,7 +25,9 @@
 		</field>
 	</record>
 	
-	<record id="action_export_to_excel" model="ir.actions.act_window">
+	<!--Code Commented to remove the temporary Menu, Once Testing is successful will remove these lines-->
+	
+	<!--<record id="action_export_to_excel" model="ir.actions.act_window">
 		<field name="name">Export to Excel</field>
 		<field name="res_model">tax.excel.report</field>
 		<field name="view_type">form</field>
@@ -34,5 +36,5 @@
 		<field name="target">new</field>		
 	</record>	
 	
-	<menuitem id="menu_export_to_excel" action="action_export_to_excel" parent="menu_tax_reports"/>
+	<menuitem id="menu_export_to_excel" action="action_export_to_excel" parent="menu_tax_reports"/>-->
 </odoo>

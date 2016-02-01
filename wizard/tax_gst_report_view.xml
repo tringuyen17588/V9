@@ -13,7 +13,8 @@
 					<field name="date_to" attrs="{'required': [('period_select','!=', 'all_dates')],
 													'invisible':[('period_select','=','all_dates')]}"/>  
 					<field name="account_report_id" domain="[('parent_id','=',False)]"/>
-					<field name="journal_wise"/>					
+					<field name="journal_wise" string="Print Journal Lines" attrs="{'invisible':[('account_report_type','!=','detailed_report')]}"/>	
+					<field name="account_report_type" invisible="1"/>				
         		</group>
         		<footer>
 					<button name="print_report" string="Print" type="object"

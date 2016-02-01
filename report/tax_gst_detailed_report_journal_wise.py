@@ -5,7 +5,7 @@ from openerp import api, fields, models
 from openerp.exceptions import Warning
 
 
-class report_tax_gst_code_wise(models.AbstractModel):
+class tax_gst_detailed_report_journal_wise(models.AbstractModel):
     _name = 'report.ia_au_gst_reporting.tax_gst_detailed_report_journal_wise'
 
     def get_tax_lines(self, data):
@@ -68,6 +68,7 @@ class report_tax_gst_code_wise(models.AbstractModel):
                              " from account_invoice_line as AIL,"
                              "account_invoice_line_tax as AILT, account_invoice as AI where "
                              "AIL.id=AILT.invoice_line_id and AI.id=AIL.invoice_id"
+                             " and AI.state in ('open', 'paid')"
                              " and AILT.tax_id in " + str(tuple(tax_ids)))
             invoiced_tax_lines = self._cr.dictfetchall()
             group_invoice = {}
