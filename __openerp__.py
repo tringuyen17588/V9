@@ -2,15 +2,15 @@
 {
     'name': 'Australian GST Reporting',
     'version': '1.0',
-    'depends': ['base', 'report', 'account'],
-    'author': 'Drishti Tech',
+    'depends': ['base', 'report', 'account_accountant', 'l10n_au'],
+    'author': 'Ioppolo & Associates',
     'description': """
 Australian GST Reporting
-=====================
+====================================
 Generate Reports based on Tax Codes
 
     """,
-    'website': 'http://www.drishtitech.com',
+    'website': 'http://ioppolo.com.au/',
     'category': 'Accounting',
     'sequence': 0,
     'demo': [],
@@ -22,9 +22,10 @@ Generate Reports based on Tax Codes
              'views/tax_gst_report_view.xml',
              'wizard/tax_gst_report_view.xml',
              'views/account_invoice_tax_view.xml',
+             'wizard/open_tax_balances.xml',
              'views/tax_report_hierarchy_view.xml',
              'views/tax_gst_report_detailed_journal_wise.xml',
-             'wizard/tax_excel_report.xml'
+             'wizard/tax_excel_report.xml',
              ],
     'qweb': [],
     'installable': True,
