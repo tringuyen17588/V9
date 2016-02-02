@@ -67,22 +67,11 @@ class TaxExcelReport(models.TransientModel):
             col = 0
             for rec in res:
                 if rec.get('level') > 0:
-                    col = rec.get('level')
-                    current_index = res.index(rec)
-                    prev_index = current_index - 1
+                    col = rec.get('level') - 1
                     taxed_amount = rec.get('tax_amount')
                     taxed_amount = format(taxed_amount, '.2f')
                     invoiced_amount = rec.get('invoiced_amount', 0.0)
                     invoiced_amount = format(round(invoiced_amount, 2), '.2f')
-                    if prev_index >= 0:
-                        if rec.get('level') == res[prev_index].get('level') + 1 or rec.get('level') < res[prev_index].get('level'):
-                            col = col - 1
-                        elif rec.get('level') > res[prev_index].get('level'):
-                            if row_column_list[-1]:
-                                col = row_column_list[-1].get('col')[0] + 1
-                        elif rec.get('level') == res[prev_index].get('level'):
-                            if row_column_list[-1]:
-                                col = row_column_list[-1].get('col')[0]
                     if rec.get('level') != max_level:
                         sheet.write_merge(row, row + 1, col, max_level,
                                           rec.get('name'), text_in_bold)

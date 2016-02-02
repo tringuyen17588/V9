@@ -116,7 +116,7 @@
             <field name="view_type">tree</field>
             <field name="view_id" ref="view_tax_report_tree_hierarchy"/>
             <field name="domain">[('parent_id','=',False),('type','=','sum')]</field>
-            <field name="context">{'show_button': True}</field>
+            <field name="context">{'show_button': True, 'date_from': context.get('date_from'), 'date_to': context.get('date_to')}</field>
         </record>
         
         <record id="view_account_tax_tree" model="ir.ui.view">
@@ -141,7 +141,7 @@
 			view_mode="tree"
       		view_type="tree"
 	     	view_id="ia_au_gst_reporting.view_account_tax_tree"     	
-      		context="{'report_id': active_id, 'show_button':True}"/>
+      		context="{'report_id': active_id, 'show_button':True, 'date_from':context.get('date_from'), 'date_to':context.get('date_to')}"/>
               
         <record id="view_account_account_tag_form" model="ir.ui.view">
             <field name="name">account.tag.form</field>
@@ -161,7 +161,7 @@
         </record>
         
         <menuitem id="menu_tax_report_tree_hierarchy" name="Tax Reports Hierarchy" parent="menu_tax_reports" action="action_tax_report_tree_hierarchy_without_balance"/>
-        <menuitem id="menu_tax_report_tree_hierarchy_with_balance" name="Tax Reports Balances" parent="menu_tax_reports" action="action_tax_report_tree_hierarchy"/>
+<!--        <menuitem id="menu_tax_report_tree_hierarchy_with_balance" name="Tax Reports Balances" parent="menu_tax_reports" action="action_tax_report_tree_hierarchy"/-->
         
             <record id="action_tax_tags" model="ir.actions.act_window">
             <field name="name">Tax Groups</field>

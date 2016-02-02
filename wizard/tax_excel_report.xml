@@ -18,7 +18,8 @@
 					 </group>			
 				</group>
 				<footer>
-					<button name="print_report" type="object" string="Print" icon="gtk-print" class="oe_highlight"/>
+					<button name="print_report" type="object" string="Print" icon="gtk-print" class="oe_highlight" 
+					 context="{'date_from': context.get('date_from'), 'date_to': context.get('date_to')}"/>
 					<button special="cancel" string="Cancel" icon="gtk-cancel" />
 				</footer>
 			</form>

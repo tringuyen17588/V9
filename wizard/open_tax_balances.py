@@ -14,25 +14,8 @@ except ImportError:
 from dateutil.relativedelta import relativedelta
 
 
-class GstReport(models.TransientModel):
-    _name = 'gst.report'
-    _description = "GST Report"
-
-    @api.multi
-    def _get_report_id(self):
-        reports_on_wizard = self.env['account.tax.report'].search(
-                                                  [('parent_id', '=',
-                                                    False)])
-        reports_of_view_type = self.env['account.tax.report'].search(
-                                         [('id', 'in', reports_on_wizard.ids),
-                                          ('type', '=', 'sum')], limit=1,
-                                         order='sequence asc')
-        return reports_of_view_type.id
-
-    @api.onchange('account_report_id')
-    def onchange_account_report_id(self):
-        if self.account_report_id:
-            self.account_report_type = self.account_report_id.type
+class open_tax_balances(models.TransientModel):
+    _name = 'open.tax.balances'
 
     period_select = fields.Selection(string='Select Period',
                                      selection=[('tax_quarter_1',
@@ -78,25 +61,11 @@ class GstReport(models.TransientModel):
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self:
                             self.env['res.users'].browse(self._uid).company_id)
-    account_report_id = fields.Many2one('account.tax.report',
-                                        string='Tax Reports', required=True,
-                                        default=_get_report_id)
-    account_report_type = fields.Selection([('sum', 'View'),
-                                    ('accounts', 'Tax Group'),
-                                    ('account_type', 'Tax Code'),
-                                    ('account_report', 'Report Value'),
-                                    ('detailed_report',
-                                     'Detailed Report')
-                                    ],
-                                   string='Account Report Type',
-                                   default='sum')
-    journal_wise = fields.Boolean(string='Print Journal Lines',
-                  help='Using this field you can Print Report Journal wise')
-
+    
     @api.onchange('period_select')
     def onchange_period_select(self):
-        if self.account_report_id:
-            self.account_report_type = self.account_report_id.type
+#         if self.account_report_id:
+#             self.account_report_type = self.account_report_id.type
         quarter_allocation = {1: [], 2: [], 3: [], 4: []}
         if self.period_select:
             date_today = datetime.date.today()
@@ -343,36 +312,3 @@ class GstReport(models.TransientModel):
                         self.date_to = False
             else:
                 raise Warning('Fiscal Year Last Day is not set!')
-
-    def _build_contexts(self, data):
-        result = {}
-        result['date_from'] = data['form']['date_from'] or False
-        result['date_to'] = data['form']['date_to'] or False
-        result['company_id'] = data['form']['company_id'] or False
-        return result
-
-    @api.multi
-    def print_report(self):
-        self.ensure_one()
-        data = {}
-        data['ids'] = self.env.context.get('active_ids', [])
-        data['model'] = self.env.context.get('active_model', 'ir.ui.menu')
-        data['form'] = self.read(['date_from', 'date_to', 'company_id',
-                                  'account_tax_id', 'account_report_id',
-                                  'journal_wise'])[0]
-        used_context = self._build_contexts(data)
-        data['form']['used_context'] = dict(used_context,
-                                    lang=self.env.context.get('lang', 'en_US'))
-#         report_obj = self.env['account.tax.report'].browse(
-#                                        data['form']['account_report_id'][0])
-        if self.account_report_type == 'detailed_report':
-            if self.journal_wise:
-                return self.env['report'].get_action(self,
-                 'ia_au_gst_reporting.tax_gst_detailed_report_journal_wise',
-                 data=data)
-            else:
-                return self.env['report'].get_action(self,
-                 'ia_au_gst_reporting.tax_gst_report_detailed', data=data)
-        else:
-            return self.env['report'].get_action(self,
-                     'ia_au_gst_reporting.report_tax_gst', data=data)
