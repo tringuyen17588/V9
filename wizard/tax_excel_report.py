@@ -11,6 +11,47 @@ from ..format_common_excel import font_style
 class TaxExcelReport(models.TransientModel):
     _name = 'tax.excel.report'
 
+    period_select = fields.Selection(string='Select Period',
+                                     selection=[('tax_quarter_1',
+                                                 'Tax Quarter 1'),
+                                                ('tax_quarter_2',
+                                                 'Tax Quarter 2'),
+                                                ('tax_quarter_3',
+                                                 'Tax Quarter 3'),
+                                                ('tax_quarter_4',
+                                                 'Tax Quarter 4'),
+                                                ('all_dates', 'All Dates'),
+                                                ('today', 'Today'),
+                                                ('this_week', 'This Week'),
+                                                ('this_week_to_date',
+                                                 'This Week to Date'),
+                                                ('this_month', 'This Month'),
+                                                ('this_month_to_date',
+                                                 'This Month to Date'),
+                                                ('this_tax_quarter',
+                                                 'This Tax Quarter'),
+                                                ('this_tax_quarter_to_date',
+                                                 'This Tax Quarter to Date'),
+                                                ('this_tax_year_to_date',
+                                                 'This Tax Year to Date'),
+                                                ('yesterday', 'Yesterday'),
+                                                ('last_week', 'Last Week'),
+                                                ('last_week_to_date',
+                                                 'Last Week to Date'),
+                                                ('last_month', 'Last Month'),
+                                                ('last_month_to_date',
+                                                 'Last Month to Date'),
+                                                ('last_tax_quarter',
+                                                 'Last Tax Quarter'),
+                                                ('last_tax_quarter_to_date',
+                                                 'Last Tax Quarter to Date'),
+                                                ('last_tax_year',
+                                                 'Last Tax Year'),
+                                                ('custom', 'Custom')
+                                                ],
+                                     default='last_tax_year')
+    date_from = fields.Date(string='Start Date')
+    date_to = fields.Date(string='End Date')
     report_id = fields.Many2one('account.tax.report', string='Report')
     excel_data = fields.Binary(string='Report Data', readonly=True)
     name = fields.Char(string='File Name')
@@ -31,13 +72,13 @@ class TaxExcelReport(models.TransientModel):
             last_inv = self.env['account.invoice'].search([],
                                                       order='date_invoice desc',
                                                       limit=1)
-            used_context = {'date_from': first_inv.date_invoice,
-                            'date_to': last_inv.date_invoice}
+            used_context = {'date_from': self._context.get('date_from'),
+                            'date_to': self._context.get('date_to')}
             data = {'account_report_id': [self.report_id.id],
                     'used_context': dict(used_context,
                                          lang=self.env.context.get('lang', 'en_US')
                                          )}
-            tax_report_obj = self.env['report.ia_au_gst_reporting.report_tax_gst']
+            tax_report_obj = self.env['report.ia_au_gst_reporting.report_tax_gst'].with_context(used_context)
             res = report_tax_gst.get_account_lines(tax_report_obj, data)
             workbook = xlwt.Workbook()
             text_in_bold = font_style(bold=1, border=1)

@@ -59,17 +59,34 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
             tax_ids = purchase_taxes.ids
         if not vendor_invoices and customer_invoices:
             tax_ids = sale_taxes.ids
+        dates = [data['date_from'], data['date_to']]
         if tax_ids and data.get('journal_wise'):
-            self._cr.execute("Select AIL.price_subtotal as price_subtotal, "
-                             "AIL.price_unit as price_unit,"
-                             "AIL.invoice_id as invoice_id,"
-                             " AILT.tax_id as tax_id,"
-                             " AI.journal_id as journal_id"
-                             " from account_invoice_line as AIL,"
-                             "account_invoice_line_tax as AILT, account_invoice as AI where "
-                             "AIL.id=AILT.invoice_line_id and AI.id=AIL.invoice_id"
-                             " and AI.state in ('open', 'paid')"
-                             " and AILT.tax_id in " + str(tuple(tax_ids)))
+            if False in dates:
+                query = "Select AIL.price_subtotal as price_subtotal, "\
+                        "AIL.price_unit as price_unit,"\
+                        "AIL.invoice_id as invoice_id,"\
+                        " AILT.tax_id as tax_id,"\
+                        " AI.journal_id as journal_id"\
+                        " from account_invoice_line as AIL,"\
+                        "account_invoice_line_tax as AILT, account_invoice as AI where "\
+                        "AIL.id=AILT.invoice_line_id and AI.id=AIL.invoice_id"\
+                        " and AI.state in ('open', 'paid')"\
+                        " and AILT.tax_id in %s"
+                params = (tuple(tax_ids),)
+            else:
+                query = "Select AIL.price_subtotal as price_subtotal, "\
+                        "AIL.price_unit as price_unit,"\
+                        "AIL.invoice_id as invoice_id,"\
+                        " AILT.tax_id as tax_id,"\
+                        " AI.journal_id as journal_id"\
+                        " from account_invoice_line as AIL,"\
+                        "account_invoice_line_tax as AILT, account_invoice as AI where "\
+                        "AIL.id=AILT.invoice_line_id and AI.id=AIL.invoice_id"\
+                        " and AI.state in ('open', 'paid')"\
+                        " and AILT.tax_id in %s"\
+                        " and AI.date_invoice>=%s and AI.date_invoice<=%s"
+                params = (tuple(tax_ids),) + tuple(dates)
+            self.env.cr.execute(query, params)
             invoiced_tax_lines = self._cr.dictfetchall()
             group_invoice = {}
             for rec in invoiced_tax_lines:
@@ -99,7 +116,6 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                                             'invoice_id': rec.get('invoice_id')}
                                             ]}
                                           })
-
             for journal in group_invoice.keys():
                 journal_line = {}
                 tax_line_list = []
@@ -109,13 +125,16 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                 journal_wise_tax_amount = 0.0
                 for tax in journal_record.keys():
                     tax_line = {}
+                    invoice_line_details = []
                     tax_obj = self.env['account.tax'].browse(tax)
                     tax_record = journal_record.get(tax)
                     price_unit = 0.0
                     price_subtotal = 0.0
                     sum_amount = 0.0
                     for l in tax_record:
+                        invoice_rec = {}
                         invoice_id = l.get('invoice_id')
+                        invoice_obj = self.env['account.invoice'].browse(invoice_id)
                         self._cr.execute("SELECT COALESCE(amount, 0.0)"
                               " from account_invoice_tax where invoice_id=" + str(invoice_id)+
                               " and tax_id=" + str(tax))
@@ -127,10 +146,15 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                         price_unit += l.get('price_unit')
                         price_subtotal += l.get('price_subtotal')
                         sum_amount += amount
+                        invoice_rec.update({'invoice_number': invoice_obj.number,
+                                            'price_subtotal': l.get('price_subtotal'),
+                                            'tax_amount': amount})
+                        invoice_line_details.append(invoice_rec)
                     t_dic = {'price_subtotal': price_subtotal,
                              'tax_amount': sum_amount,
                              'name': tax_obj.name,
-                             'description': tax_obj.description}
+                             'description': tax_obj.description,
+                             'invoice_details': invoice_line_details}
                     tax_line.update(t_dic)
                     tax_line_list.append(tax_line)
                     journal_wise_price_subtotal += price_subtotal
