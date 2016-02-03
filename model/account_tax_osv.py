@@ -25,17 +25,28 @@ class account_tax(osv.osv):
         for tax in tax_codes:
             res[tax.id] = dict((field, 0.0) for field in fields)
         if tax_codes:
-            invoice_line_query = "SELECT COALESCE(SUM(price_subtotal), 0) as "\
-                "invoiced_amount, account_invoice_line_tax.tax_id from "\
-                "account_invoice_line, account_invoice_line_tax, account_invoice"\
-                " where account_invoice_line.id in"\
-                " (select invoice_line_id from account_invoice_line_tax where"\
-                " tax_id IN %s) and account_invoice_line.id=account_invoice_line_tax.invoice_line_id"\
-                " and account_invoice_line.invoice_id=account_invoice.id and"\
-                " account_invoice.date_invoice >= %s and"\
-                " account_invoice.date_invoice <= %s" +\
-                " GROUP BY account_invoice_line_tax.tax_id"
-            param = (tuple(tax_codes._ids),) + tuple(dates)
+            if False in dates:
+                invoice_line_query = "SELECT COALESCE(SUM(price_subtotal), 0) as "\
+                    "invoiced_amount, account_invoice_line_tax.tax_id from "\
+                    "account_invoice_line, account_invoice_line_tax, account_invoice"\
+                    " where account_invoice_line.id in"\
+                    " (select invoice_line_id from account_invoice_line_tax where"\
+                    " tax_id IN %s) and account_invoice_line.id=account_invoice_line_tax.invoice_line_id"\
+                    " and account_invoice_line.invoice_id=account_invoice.id "\
+                    " GROUP BY account_invoice_line_tax.tax_id"
+                param = (tuple(tax_codes._ids),)
+            else:
+                invoice_line_query = "SELECT COALESCE(SUM(price_subtotal), 0) as "\
+                    "invoiced_amount, account_invoice_line_tax.tax_id from "\
+                    "account_invoice_line, account_invoice_line_tax, account_invoice"\
+                    " where account_invoice_line.id in"\
+                    " (select invoice_line_id from account_invoice_line_tax where"\
+                    " tax_id IN %s) and account_invoice_line.id=account_invoice_line_tax.invoice_line_id"\
+                    " and account_invoice_line.invoice_id=account_invoice.id and"\
+                    " account_invoice.date_invoice >= %s and"\
+                    " account_invoice.date_invoice <= %s" +\
+                    " GROUP BY account_invoice_line_tax.tax_id"
+                param = (tuple(tax_codes._ids),) + tuple(dates)
             cr.execute(invoice_line_query, param)
             for rw in cr.dictfetchall():
                 res_inv[rw['tax_id']] = rw
