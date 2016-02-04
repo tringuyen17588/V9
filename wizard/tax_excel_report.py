@@ -66,14 +66,10 @@ class TaxExcelReport(models.TransientModel):
         else:
             currency = False
         if self.report_id:
-            first_inv = self.env['account.invoice'].search([],
-                                                       order='date_invoice asc',
-                                                       limit=1)
-            last_inv = self.env['account.invoice'].search([],
-                                                      order='date_invoice desc',
-                                                      limit=1)
-            used_context = {'date_from': self._context.get('date_from'),
-                            'date_to': self._context.get('date_to')}
+            date_from = self._context.get('date_from')
+            date_to = self._context.get('date_to')
+            used_context = {'date_from': date_from,
+                            'date_to': date_to}
             data = {'account_report_id': [self.report_id.id],
                     'used_context': dict(used_context,
                                          lang=self.env.context.get('lang', 'en_US')
@@ -95,16 +91,20 @@ class TaxExcelReport(models.TransientModel):
             max_level = max(level)
             sheet.write_merge(1, 2, max_level - 1, max_level + 2,
                               self.report_id.name, main_header)
+            sheet.write_merge(4, 4, 1, 2, 'Date From', table_header)
+            sheet.write_merge(4, 4, 3, 4, date_from if date_from else '', text_with_border)
+            sheet.write_merge(4, 4, 6, 7, 'Date To', table_header)
+            sheet.write_merge(4, 4, 8, 9, date_to if date_to else '', text_with_border)
             inv_amt_col_start = max_level + 1
             inv_amt_col_stop = max_level + 3
             tax_amt_col_start = max_level + 4
             tax_amt_col_stop = max_level + 6
-            sheet.write_merge(4, 5, 0, max_level, 'Name', table_header)
-            sheet.write_merge(4, 5, inv_amt_col_start, inv_amt_col_stop,
+            sheet.write_merge(6, 7, 0, max_level, 'Name', table_header)
+            sheet.write_merge(6, 7, inv_amt_col_start, inv_amt_col_stop,
                               'Invoiced Amount\n(Tax Exclusive)', table_header)
-            sheet.write_merge(4, 5, tax_amt_col_start, tax_amt_col_stop,
+            sheet.write_merge(6, 7, tax_amt_col_start, tax_amt_col_stop,
                               'Taxed Amount', table_header)
-            row = 6
+            row = 8
             col = 0
             for rec in res:
                 if rec.get('level') > 0:
