@@ -11,7 +11,8 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
     def get_tax_lines(self, data):
         domain = []
         res = {'Purchase': [], 'Sale': []}
-        report_obj = self.env['account.tax.report'].browse(data['account_report_id'][0])
+        report_obj = self.env['account.tax.report'].browse(
+                                                data['account_report_id'][0])
         report_tax_ids = report_obj.tax_ids.ids
         account_tax_env = self.env['account.tax']
         account_invoice_env = self.env['account.invoice']
@@ -63,24 +64,28 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
         if tax_ids and data.get('journal_wise'):
             if False in dates:
                 query = "Select AIL.price_subtotal as price_subtotal, "\
+                        " AIL.product_id as product_id, "\
                         "AIL.price_unit as price_unit,"\
                         "AIL.invoice_id as invoice_id,"\
                         " AILT.tax_id as tax_id,"\
                         " AI.journal_id as journal_id"\
                         " from account_invoice_line as AIL,"\
-                        "account_invoice_line_tax as AILT, account_invoice as AI where "\
+                        "account_invoice_line_tax as AILT, "\
+                        "account_invoice as AI where "\
                         "AIL.id=AILT.invoice_line_id and AI.id=AIL.invoice_id"\
                         " and AI.state in ('open', 'paid')"\
                         " and AILT.tax_id in %s"
                 params = (tuple(tax_ids),)
             else:
-                query = "Select AIL.price_subtotal as price_subtotal, "\
+                query = "Select AIL.price_subtotal as price_subtotal,"\
+                        " AIL.product_id as product_id, "\
                         "AIL.price_unit as price_unit,"\
                         "AIL.invoice_id as invoice_id,"\
                         " AILT.tax_id as tax_id,"\
                         " AI.journal_id as journal_id"\
                         " from account_invoice_line as AIL,"\
-                        "account_invoice_line_tax as AILT, account_invoice as AI where "\
+                        "account_invoice_line_tax as AILT, "\
+                        "account_invoice as AI where "\
                         "AIL.id=AILT.invoice_line_id and AI.id=AIL.invoice_id"\
                         " and AI.state in ('open', 'paid')"\
                         " and AILT.tax_id in %s"\
@@ -94,27 +99,60 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                     existing_rec = group_invoice.get(rec.get('journal_id'))
                     if rec.get('tax_id') in existing_rec.keys():
                         existing_tax_rec = existing_rec.get(rec.get('tax_id'))
-#                         price_unit = existing_tax_rec.get('price_unit') + rec.get('price_unit')
-#                         price_subtotal = existing_tax_rec.get('price_subtotal') + rec.get('price_subtotal')
-                        tax_rec_to_append = {'price_unit': rec.get('price_unit'),
-                                         'price_subtotal': rec.get('price_subtotal'),
-                                         'invoice_id': rec.get('invoice_id')}
-                        existing_tax_rec.append(tax_rec_to_append)
-                        existing_rec.update({rec.get('tax_id'): existing_tax_rec})
+                        if rec.get('invoice_id') in existing_tax_rec.keys():
+                            existing_inv_rec = existing_tax_rec.get(
+                                                        rec.get('invoice_id'))
+                            existing_inv_rec.append({'price_subtotal':
+                                                     rec.get('price_subtotal'),
+                                                     'price_unit':
+                                                     rec.get('price_unit'),
+                                                     'product_id':
+                                                     rec.get('product_id')})
+                            existing_tax_rec.update({rec.get('invoice_id'):
+                                                     existing_inv_rec})
+                        else:
+                            existing_tax_rec.update({rec.get('invoice_id'):
+                                                     [{'price_subtotal':
+                                                   rec.get('price_subtotal'),
+                                                       'price_unit':
+                                                   rec.get('price_unit'),
+                                                    'product_id':
+                                                    rec.get('product_id')}]
+                                                     })
+#                         tax_rec_to_append = {'price_unit': rec.get('price_unit'),
+#                                          'price_subtotal': rec.get('price_subtotal'),
+#                                          'invoice_id': rec.get('invoice_id')}
+#                         existing_tax_rec.append(tax_rec_to_append)
+#                         existing_rec.update({rec.get('tax_id'): existing_tax_rec})
                     else:
                         existing_rec.update({rec.get('tax_id'):
-                                             [{'price_unit': rec.get('price_unit'),
-                                              'price_subtotal': rec.get('price_subtotal'),
-                                              'invoice_id': rec.get('invoice_id')}
-                                              ]})
+                                             {rec.get('invoice_id'):
+                                              [{'price_subtotal':
+                                                rec.get('price_subtotal'),
+                                               'price_unit':
+                                               rec.get('price_unit'),
+                                               'product_id':
+                                               rec.get('product_id')}]
+                                              }
+                                             })
+#                         existing_rec.update({rec.get('tax_id'):
+#                                              [{'price_unit': rec.get('price_unit'),
+#                                               'price_subtotal': rec.get('price_subtotal'),
+#                                               'invoice_id': rec.get('invoice_id')}
+#                                               ]})
                     group_invoice.update({rec.get('journal_id'): existing_rec})
                 else:
                     group_invoice.update({rec.get('journal_id'):
                                           {rec.get('tax_id'):
-                                           [{'price_unit': rec.get('price_unit'),
-                                            'price_subtotal': rec.get('price_subtotal'),
-                                            'invoice_id': rec.get('invoice_id')}
-                                            ]}
+                                           {rec.get('invoice_id'):
+                                            [{'price_unit':
+                                              rec.get('price_unit'),
+                                              'price_subtotal':
+                                              rec.get('price_subtotal'),
+                                              'product_id':
+                                              rec.get('product_id')}
+                                             ]}
+                                           }
                                           })
             for journal in group_invoice.keys():
                 journal_line = {}
@@ -131,24 +169,39 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                     price_unit = 0.0
                     price_subtotal = 0.0
                     sum_amount = 0.0
-                    for l in tax_record:
+                    for l in tax_record.keys():
+                        invoice_record = tax_record.get(l)
+                        invoice_price_unit = 0.0
+                        invoice_description = ''
                         invoice_rec = {}
-                        invoice_id = l.get('invoice_id')
-                        invoice_obj = self.env['account.invoice'].browse(invoice_id)
+                        invoice_obj = self.env['account.invoice'].browse(l)
                         self._cr.execute("SELECT COALESCE(amount, 0.0)"
-                              " from account_invoice_tax where invoice_id=" + str(invoice_id)+
-                              " and tax_id=" + str(tax))
+                              " from account_invoice_tax where invoice_id=" +
+                              str(l) + " and tax_id=" + str(tax))
                         tax_amount = self._cr.fetchone()
                         if tax_amount:
                             amount = tax_amount[0]
                         else:
                             amount = 0.0
-                        price_unit += l.get('price_unit')
-                        price_subtotal += l.get('price_subtotal')
+                        for inv_rec in invoice_record:
+                            product_obj = self.env['product.product'].browse(
+                                                  inv_rec.get('product_id'))
+                            if invoice_record.index(inv_rec) != len(invoice_record) -1:
+                                product_name = product_obj.name + ', '
+                            else:
+                                product_name = product_obj.name
+                            invoice_description += product_name
+                            invoice_price_unit += inv_rec.get('price_unit')
+                            price_unit += inv_rec.get('price_unit')
+                            price_subtotal += inv_rec.get('price_subtotal')
                         sum_amount += amount
-                        invoice_rec.update({'invoice_number': invoice_obj.number,
-                                            'price_subtotal': l.get('price_subtotal'),
-                                            'tax_amount': amount})
+                        invoice_rec.update({'invoice_number':
+                                            invoice_obj.number,
+                                            'price_subtotal':
+                                            invoice_price_unit,
+                                            'tax_amount': amount,
+                                            'invoice_description':
+                                            invoice_description})
                         invoice_line_details.append(invoice_rec)
                     t_dic = {'price_subtotal': price_subtotal,
                              'tax_amount': sum_amount,
@@ -214,4 +267,5 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
             'purchase_totals': purchase_totals
         }
         return self.env['report'].render(
-                'ia_au_gst_reporting.tax_gst_detailed_report_journal_wise', docargs)
+                'ia_au_gst_reporting.tax_gst_detailed_report_journal_wise',
+                docargs)

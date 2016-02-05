@@ -25,13 +25,14 @@
 						<table t-foreach="sale_tax_lines" t-as="sale_tax_line" class="table table-condensed">
 		                    <thead>
 		                    	<tr>
-		                    		<th colspan="4">
+		                    		<th colspan="5">
 		                    			<span t-esc="sale_tax_line['name']"/>
 		                    		</th>
 		                    	</tr>
 		                        <tr>
 		                            <th style="vertical-align:middle;text-align:center">Tax Code</th>
 		                            <th style="vertical-align:middle;text-align:center">Tax Code Description /<br/> Invoice Number</th>
+		                            <th style="vertical-align:middle;text-align:center">Invoice Description</th>
 		                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Sales Excluding Tax)</th>
 		                            <th style="vertical-align:middle;text-align:center">Paid Amount<br/>(Tax Amount)</th>
 		                        </tr>
@@ -58,6 +59,9 @@
 			                        	<td class="text-left">
 			                        		<span t-esc="invoice_detail['invoice_number']"/>
 			                        	</td>
+			                        	<td class="text-left">
+			                        		<span t-esc="invoice_detail['invoice_description']"/>
+			                        	</td>
 			                        	<td class="text-right">
 			                                 <span t-esc="invoice_detail['price_subtotal']"/>
 			                            </td>
@@ -66,6 +70,7 @@
 			                            </td>
 			                        </tr>
 			                        <tr>
+			                        	<td></td>
 			                        	<td></td>
 			                        	<td class="text-right" style="border-top:1px solid black"><strong><span t-esc="tax_line['name']"/> - Total</strong></td>
 			                        	<td class="text-right" style="border-top:1px solid black">
@@ -81,13 +86,14 @@
 			                        </tr>
 			                        <t t-if="sale_tax_line['tax_lines'].index(tax_line) != len(sale_tax_line['tax_lines'])-1">
 			                        	<tr>
-			                        		<td colspan="4"></td>
+			                        		<td colspan="5"></td>
 			                        	</tr>
 			                        </t>
 		                    	</t>
 		                        
 		                      	<tr class="border-black">
 		                            <td colspan="2" class="text-right"><strong><span t-esc="sale_tax_line['name']"/> - Total</strong></td>
+		                            <td></td>
 		                            <td class="text-right">
 		                                <strong>
 		                                	<span t-esc="sale_tax_line['total_amount']"/>
@@ -101,13 +107,13 @@
 		                        </tr>
 	                         	<t t-if="sale_tax_lines.index(sale_tax_line) != len(sale_tax_lines)-1">
 		                        	<tr>
-		                        		<td colspan="4"></td>
+		                        		<td colspan="5"></td>
 		                        	</tr>
 		                        </t>
 		                    </tbody>
 	                    </table>
                     <div class="row">
-                    	 <div class="col-xs-4 pull-right">
+                    	 <div class="col-xs-5 pull-right">
 		                    <table class="table table-condensed">
 		                        <tr class="border-black">
 		                            <td><strong>Sales Tax - Total</strong></td>
@@ -128,13 +134,14 @@
 					<table t-foreach="purchase_tax_lines" t-as="purchase_tax_line" class="table table-condensed">
 	                    <thead>
 	                    	<tr>
-	                    		<th colspan="4">
+	                    		<th colspan="5">
 	                    			<span t-esc="purchase_tax_line['name']"/>
 	                    		</th>
 	                    	</tr>
 	                        <tr>
 	                            <th style="vertical-align:middle;text-align:center">Tax Code</th>
-	                            <th style="vertical-align:middle;text-align:center">Tax Code Description</th>
+	                            <th style="vertical-align:middle;text-align:center">Tax Code Description/<br/>Invoice Number</th>
+	                            <th style="vertical-align:middle;text-align:center">Invoice Description</th>
 	                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Sales Excluding Tax)</th>
 	                            <th style="vertical-align:middle;text-align:center">Paid Amount<br/>(Tax Amount)</th>
 	                        </tr>
@@ -160,6 +167,9 @@
 		                        	<td class="text-left">
 		                        		<span t-esc="invoice_detail['invoice_number']"/>
 		                        	</td>
+		                        	<td class="text-left">
+		                        		<span t-esc="invoice_detail['invoice_description']"/>
+		                        	</td>
 		                        	<td class="text-right">
 		                                 <span t-esc="invoice_detail['price_subtotal']"/>
 		                            </td>
@@ -168,6 +178,7 @@
 		                            </td>
 		                        </tr>
 		                        <tr>
+		                        	<td></td>
 		                        	<td></td>
 		                        	<td class="text-right" style="border-top:1px solid black">
 		                        		<strong><span t-esc="tax_line['name']"/> - Total</strong>
@@ -185,13 +196,14 @@
 		                        </tr>
 		                        <t t-if="purchase_tax_line['tax_lines'].index(tax_line) != len(purchase_tax_line['tax_lines'])-1">
 		                        	<tr>
-		                        		<td colspan="4"></td>
+		                        		<td colspan="5"></td>
 		                        	</tr>
 		                        </t>
 	                    	</t>
 	                        
 	                      	<tr class="border-black">
 	                            <td colspan="2" class="text-right"><strong><span t-esc="purchase_tax_line['name']"/> - Total</strong></td>
+	                            <td></td>
 	                            <td class="text-right">
 	                                <strong>
 	                                	<span t-esc="purchase_tax_line['total_amount']"/>
@@ -205,13 +217,13 @@
 	                        </tr>
 	                        <t t-if="purchase_tax_lines.index(purchase_tax_line) != len(purchase_tax_lines)-1">
 	                        	<tr>
-	                        		<td colspan="4"></td>
+	                        		<td colspan="5"></td>
 	                        	</tr>
 	                        </t>
 	                    </tbody>
                     </table>
                     <div class="row">
-	                    <div class="col-xs-4 pull-right">
+	                    <div class="col-xs-5 pull-right">
 		                    <table class="table table-condensed">
 		                        <tr class="border-black">
 		                            <td><strong>Purchase Tax Total</strong></td>

@@ -15,6 +15,7 @@ class tax_gst_report_detailed(models.AbstractModel):
         report_tax_ids = report_obj.tax_ids.ids
         account_tax_env = self.env['account.tax']
         account_invoice_env = self.env['account.invoice']
+        dates = [data['date_from'], data['date_to']]
         if report_tax_ids:
             sale_taxes = account_tax_env.search([('company_id', '=',
                                                   data['company_id'][0]),
@@ -56,13 +57,20 @@ class tax_gst_report_detailed(models.AbstractModel):
                         ' COALESCE(SUM(account_invoice.amount_untaxed), 0) as invoice_amount '\
                         'from account_invoice_tax, account_invoice'
 
-
-        query_tax_line = "select tax_id from "\
-                         "account_invoice_line_tax where tax_id not in "\
-                         "(select account_invoice_tax.tax_id from "\
-                         "account_invoice_tax,account_tax  "\
-                         "where account_invoice_tax.tax_id in %s)"\
-                         " and tax_id in %s group by tax_id"
+        if False in dates:
+            query_tax_line = "select tax_id from "\
+                            "account_invoice_line_tax where tax_id not in "\
+                            "(select account_invoice_tax.tax_id from "\
+                            "account_invoice_tax,account_tax"\
+                            " where account_invoice_tax.tax_id in %s)"\
+                            " and tax_id in %s group by tax_id"
+        else:
+            query_tax_line = "select tax_id from "\
+                             "account_invoice_line_tax where tax_id not in "\
+                             "(select account_invoice_tax.tax_id from "\
+                             "account_invoice_tax,account_tax"\
+                             " where account_invoice_tax.tax_id in %s )"\
+                             " and tax_id in %s group by tax_id"
         tax_ids = []
         invoice_ids = []
         if customer_invoices and vendor_invoices:
@@ -86,16 +94,35 @@ class tax_gst_report_detailed(models.AbstractModel):
                                  ' group by account_invoice_tax.tax_id '
                                  )
                 result = self._cr.dictfetchall()
-                self._cr.execute(query_tax_line, (tuple(tax_ids), tuple(tax_ids)))
-                tax_code_from_invoice_lines = self._cr.dictfetchall()
+                if False in dates:
+                    self._cr.execute(query_tax_line, (tuple(tax_ids),
+                                                      tuple(tax_ids)))
+                    tax_code_from_invoice_lines = self._cr.dictfetchall()
+                else:
+                    self._cr.execute(query_tax_line, (tuple(tax_ids),
+                                                      tuple(tax_ids)
+                                                      ))
+                    tax_code_from_invoice_lines = self._cr.dictfetchall()
                 for tax_code in tax_code_from_invoice_lines:
                     line = {}
-                    self._cr.execute("Select COALESCE(sum(price_subtotal),0.0) from account_invoice_line,"
-                                     "account_invoice_line_tax, account_invoice where "
-                                     "account_invoice_line.id=account_invoice_line_tax.invoice_line_id"
-                                     " and account_invoice.state in ('open', 'paid') "
-                                     "and account_invoice_line.invoice_id=account_invoice.id"
-                                     " and account_invoice_line_tax.tax_id="+str(tax_code.get('tax_id')))
+                    if False in dates:
+                        self._cr.execute("Select COALESCE(sum(price_subtotal),0.0) from account_invoice_line,"
+                                         "account_invoice_line_tax, account_invoice where "
+                                         "account_invoice_line.id=account_invoice_line_tax.invoice_line_id"
+                                         " and account_invoice.state in ('open', 'paid') "
+                                         "and account_invoice_line.invoice_id=account_invoice.id"
+                                         " and account_invoice_line_tax.tax_id=%s", 
+                                         tuple(tax_code.get('tax_id')))
+                    else:
+                        self._cr.execute("Select COALESCE(sum(price_subtotal),0.0) from account_invoice_line,"
+                                         "account_invoice_line_tax, account_invoice where "
+                                         "account_invoice_line.id=account_invoice_line_tax.invoice_line_id"
+                                         " and account_invoice.state in ('open', 'paid') "
+                                         " and account_invoice.date_invoice>=%s"
+                                         " and account_invoice.date_invoice<=%s"
+                                         " and account_invoice_line.invoice_id=account_invoice.id"
+                                         " and account_invoice_line_tax.tax_id=%s",
+                                         tuple(dates) + tuple([tax_code.get('tax_id')],))
                     invoice_line_total = self._cr.fetchone()
                     tax = self.env['account.tax'].browse(tax_code.get('tax_id'))
                     line.update({'amount_untaxed': invoice_line_total[0],

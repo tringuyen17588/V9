@@ -32,20 +32,23 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr t-foreach="sale_tax_lines" t-as="sale_tax">
-                            <td class="text-left">
-                                <span t-esc="sale_tax['tax_code']"/>
-                            </td>
-                            <td class="text-left">
-                                <span t-esc="sale_tax['tax_description']"/>
-                            </td>
-                            <td class="text-right">
-                                 <span t-esc="sale_tax['amount_untaxed']"/>
-                            </td>
-                            <td class="text-right">
-                                <span t-esc="sale_tax['taxed_amount']" />
-                            </td>
-                        </tr>
+                    	<t t-foreach="sale_tax_lines" t-as="sale_tax">
+                    		 <tr t-if="sale_tax['amount_untaxed'] and sale_tax['taxed_amount']">
+	                            <td class="text-left">
+	                                <span t-esc="sale_tax['tax_code']"/>
+	                            </td>
+	                            <td class="text-left">
+	                                <span t-esc="sale_tax['tax_description']"/>
+	                            </td>
+	                            <td class="text-right">
+	                                 <span t-esc="sale_tax['amount_untaxed']"/>
+	                            </td>
+	                            <td class="text-right">
+	                                <span t-esc="sale_tax['taxed_amount']" />
+	                            </td>
+	                        </tr>
+                    	</t>
+                       
                       	<tr class="border-black">
                             <td colspan="2" class="text-right"><strong>Total</strong></td>
                             <td class="text-right">
@@ -75,20 +78,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr t-foreach="purchase_tax_lines" t-as="purchase_tax">
-                            <td class="text-left">
-                                <span t-esc="purchase_tax['tax_code']"/>
-                            </td>
-                            <td class="text-left">
-                                <span t-esc="purchase_tax['tax_description']"/>
-                            </td>
-                            <td class="text-right">
-                                 <span t-esc="purchase_tax['amount_untaxed']"/>
-                            </td>
-                            <td class="text-right">
-                                <span t-esc="purchase_tax['taxed_amount']" />
-                            </td>
-                        </tr>
+                    	<t t-foreach="purchase_tax_lines" t-as="purchase_tax">
+                    		<tr t-if="purchase_tax['amount_untaxed'] and purchase_tax['taxed_amount']">
+	                            <td class="text-left">
+	                                <span t-esc="purchase_tax['tax_code']"/>
+	                            </td>
+	                            <td class="text-left">
+	                                <span t-esc="purchase_tax['tax_description']"/>
+	                            </td>
+	                            <td class="text-right">
+	                                 <span t-esc="purchase_tax['amount_untaxed']"/>
+	                            </td>
+	                            <td class="text-right">
+	                                <span t-esc="purchase_tax['taxed_amount']" />
+	                            </td>
+	                        </tr>
+                    	</t>
                          <tr class="border-black">
                             <td colspan="2" class="text-right"><strong>Total</strong></td>
                             <td class="text-right">
