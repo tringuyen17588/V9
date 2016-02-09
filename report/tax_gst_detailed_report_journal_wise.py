@@ -172,7 +172,7 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                     for l in tax_record.keys():
                         invoice_record = tax_record.get(l)
                         invoice_price_unit = 0.0
-                        invoice_description = ''
+#                         invoice_description = ''
                         invoice_rec = {}
                         invoice_obj = self.env['account.invoice'].browse(l)
                         self._cr.execute("SELECT COALESCE(amount, 0.0)"
@@ -184,25 +184,36 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                         else:
                             amount = 0.0
                         for inv_rec in invoice_record:
+                            invoice_rec = {}
                             product_obj = self.env['product.product'].browse(
                                                   inv_rec.get('product_id'))
-                            if invoice_record.index(inv_rec) != len(invoice_record) -1:
-                                product_name = product_obj.name + ', '
-                            else:
-                                product_name = product_obj.name
-                            invoice_description += product_name
+                            if tax_obj.amount_type == 'percent' and not tax_obj.price_include:
+                                tax_amount = (inv_rec.get('price_subtotal') * tax_obj.amount) / 100
+                            elif tax_obj.price_include:
+                                tax_amount = inv_rec.get('price_unit') - inv_rec.get('price_subtotal')
+                            invoice_rec.update({'invoice_number': invoice_obj.number,
+                                                'price_subtotal': inv_rec.get('price_subtotal'),
+                                                'tax_amount': tax_amount,
+                                                'invoice_description': product_obj.name})
+                            invoice_line_details.append(invoice_rec)
+#                             if invoice_record.index(inv_rec) != len(invoice_record) -1:
+#                                 product_name = product_obj.name + ', '
+#                             else:
+#                                 product_name = product_obj.name
+#                             invoice_description += product_name
                             invoice_price_unit += inv_rec.get('price_unit')
                             price_unit += inv_rec.get('price_unit')
                             price_subtotal += inv_rec.get('price_subtotal')
+
                         sum_amount += amount
-                        invoice_rec.update({'invoice_number':
-                                            invoice_obj.number,
-                                            'price_subtotal':
-                                            invoice_price_unit,
-                                            'tax_amount': amount,
-                                            'invoice_description':
-                                            invoice_description})
-                        invoice_line_details.append(invoice_rec)
+#                         invoice_rec.update({'invoice_number':
+#                                             invoice_obj.number,
+#                                             'price_subtotal':
+#                                             price_subtotal,
+#                                             'tax_amount': amount,
+#                                             'invoice_description':
+#                                             invoice_description})
+#                         invoice_line_details.append(invoice_rec)
                     t_dic = {'price_subtotal': price_subtotal,
                              'tax_amount': sum_amount,
                              'name': tax_obj.name,
