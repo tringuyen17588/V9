@@ -81,6 +81,7 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                         " AIL.product_id as product_id, "\
                         "AIL.price_unit as price_unit,"\
                         "AIL.invoice_id as invoice_id,"\
+                        "AIL.quantity as qty,"\
                         " AILT.tax_id as tax_id,"\
                         " AI.journal_id as journal_id"\
                         " from account_invoice_line as AIL,"\
@@ -107,7 +108,8 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                                                      'price_unit':
                                                      rec.get('price_unit'),
                                                      'product_id':
-                                                     rec.get('product_id')})
+                                                     rec.get('product_id'),
+                                                     'qty': rec.get('qty')})
                             existing_tax_rec.update({rec.get('invoice_id'):
                                                      existing_inv_rec})
                         else:
@@ -117,7 +119,9 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                                                        'price_unit':
                                                    rec.get('price_unit'),
                                                     'product_id':
-                                                    rec.get('product_id')}]
+                                                    rec.get('product_id'),
+                                                    'qty':
+                                                    rec.get('qty')}]
                                                      })
 #                         tax_rec_to_append = {'price_unit': rec.get('price_unit'),
 #                                          'price_subtotal': rec.get('price_subtotal'),
@@ -132,7 +136,9 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                                                'price_unit':
                                                rec.get('price_unit'),
                                                'product_id':
-                                               rec.get('product_id')}]
+                                               rec.get('product_id'),
+                                               'qty':
+                                               rec.get('qty')}]
                                               }
                                              })
 #                         existing_rec.update({rec.get('tax_id'):
@@ -150,7 +156,9 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                                               'price_subtotal':
                                               rec.get('price_subtotal'),
                                               'product_id':
-                                              rec.get('product_id')}
+                                              rec.get('product_id'),
+                                              'qty':
+                                              rec.get('qty')}
                                              ]}
                                            }
                                           })
@@ -161,6 +169,7 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                 journal_record = group_invoice.get(journal)
                 journal_wise_price_subtotal = 0.0
                 journal_wise_tax_amount = 0.0
+                journal_original_amount = 0.0
                 for tax in journal_record.keys():
                     tax_line = {}
                     invoice_line_details = []
@@ -169,6 +178,7 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                     price_unit = 0.0
                     price_subtotal = 0.0
                     sum_amount = 0.0
+                    invoice_original_amount = 0.0
                     for l in tax_record.keys():
                         invoice_record = tax_record.get(l)
                         invoice_price_unit = 0.0
@@ -190,10 +200,12 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                             if tax_obj.amount_type == 'percent' and not tax_obj.price_include:
                                 tax_amount = (inv_rec.get('price_subtotal') * tax_obj.amount) / 100
                             elif tax_obj.price_include:
-                                tax_amount = inv_rec.get('price_unit') - inv_rec.get('price_subtotal')
+                                tax_amount = inv_rec.get('price_unit') * inv_rec.get('qty') - inv_rec.get('price_subtotal')
+                            original_amount = inv_rec.get('price_subtotal') - tax_amount
                             invoice_rec.update({'invoice_number': invoice_obj.number,
                                                 'price_subtotal': inv_rec.get('price_subtotal'),
                                                 'tax_amount': tax_amount,
+                                                'original_amount': original_amount,
                                                 'invoice_description': product_obj.name})
                             invoice_line_details.append(invoice_rec)
 #                             if invoice_record.index(inv_rec) != len(invoice_record) -1:
@@ -204,6 +216,8 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                             invoice_price_unit += inv_rec.get('price_unit')
                             price_unit += inv_rec.get('price_unit')
                             price_subtotal += inv_rec.get('price_subtotal')
+                            invoice_original_amount += original_amount
+                            journal_original_amount += original_amount
 
                         sum_amount += amount
 #                         invoice_rec.update({'invoice_number':
@@ -218,7 +232,8 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                              'tax_amount': sum_amount,
                              'name': tax_obj.name,
                              'description': tax_obj.description,
-                             'invoice_details': invoice_line_details}
+                             'invoice_details': invoice_line_details,
+                             'invoice_original_amount': invoice_original_amount}
                     tax_line.update(t_dic)
                     tax_line_list.append(tax_line)
                     journal_wise_price_subtotal += price_subtotal
@@ -226,7 +241,8 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                 journal_line.update({'name': journal_obj.name,
                                      'tax_lines': tax_line_list,
                                      'total_amount': journal_wise_price_subtotal,
-                                     'total_tax_amount': journal_wise_tax_amount})
+                                     'total_tax_amount': journal_wise_tax_amount,
+                                     'journal_original_amount': journal_original_amount})
                 if journal_obj.type == 'sale':
                     sale_list = res.get('Sale')
                     sale_list.append(journal_line)
