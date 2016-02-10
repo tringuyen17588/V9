@@ -201,7 +201,7 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                                 tax_amount = (inv_rec.get('price_subtotal') * tax_obj.amount) / 100
                             elif tax_obj.price_include:
                                 tax_amount = inv_rec.get('price_unit') * inv_rec.get('qty') - inv_rec.get('price_subtotal')
-                            original_amount = inv_rec.get('price_subtotal') - tax_amount
+                            original_amount = inv_rec.get('price_subtotal') + tax_amount
                             invoice_rec.update({'invoice_number': invoice_obj.number,
                                                 'price_subtotal': inv_rec.get('price_subtotal'),
                                                 'tax_amount': tax_amount,

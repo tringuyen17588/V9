@@ -33,7 +33,7 @@
 		                            <th style="vertical-align:middle;text-align:center">Tax Code</th>
 		                            <th style="vertical-align:middle;text-align:center">Tax Code Description /<br/> Invoice Number</th>
 		                            <th style="vertical-align:middle;text-align:center">Invoice Description</th>
-		                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Excluding Tax)</th>
+		                            <th style="vertical-align:middle;text-align:center">Total Paid Amount<br/>(Sales Including Tax)</th>
 		                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Sales Excluding Tax)</th>
 		                            <th style="vertical-align:middle;text-align:center">Paid Amount<br/>(Tax Amount)</th>
 		                        </tr>
@@ -160,8 +160,8 @@
 	                            <th style="vertical-align:middle;text-align:center">Tax Code</th>
 	                            <th style="vertical-align:middle;text-align:center">Tax Code Description/<br/>Invoice Number</th>
 	                            <th style="vertical-align:middle;text-align:center">Invoice Description</th>
-	                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Excluding Tax)</th>
-	                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Sales Excluding Tax)</th>
+	                            <th style="vertical-align:middle;text-align:center">Total Paid Amount<br/>(Purchase Including Tax)</th>
+	                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Purchase Excluding Tax)</th>
 	                            <th style="vertical-align:middle;text-align:center">Paid Amount<br/>(Tax Amount)</th>
 	                        </tr>
 	                    </thead>
