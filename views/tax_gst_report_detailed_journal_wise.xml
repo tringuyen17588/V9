@@ -33,6 +33,7 @@
 		                            <th style="vertical-align:middle;text-align:center">Tax Code</th>
 		                            <th style="vertical-align:middle;text-align:center">Tax Code Description /<br/> Invoice Number</th>
 		                            <th style="vertical-align:middle;text-align:center">Invoice Description</th>
+		                            <th style="vertical-align:middle;text-align:center">Total Paid Amount<br/>(Sales Including Tax)</th>
 		                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Sales Excluding Tax)</th>
 		                            <th style="vertical-align:middle;text-align:center">Paid Amount<br/>(Tax Amount)</th>
 		                        </tr>
@@ -63,6 +64,9 @@
 			                        		<span t-esc="invoice_detail['invoice_description']"/>
 			                        	</td>
 			                        	<td class="text-right">
+			                        		<span t-esc="invoice_detail['original_amount']"/>
+			                        	</td>
+			                        	<td class="text-right">
 			                                 <span t-esc="invoice_detail['price_subtotal']"/>
 			                            </td>
 			                            <td class="text-right">
@@ -72,7 +76,14 @@
 			                        <tr>
 			                        	<td></td>
 			                        	<td></td>
-			                        	<td class="text-right" style="border-top:1px solid black"><strong><span t-esc="tax_line['name']"/> - Total</strong></td>
+			                        	<td class="text-right" style="border-top:1px solid black;white_space:nowrap">
+			                        		<strong><span t-esc="tax_line['name']"/> - Total</strong>
+		                        		</td>
+			                        	<td class="text-right" style="border-top:1px solid black">
+			                        		<strong >
+			                        			<span t-esc="tax_line['invoice_original_amount']"/>
+			                        		</strong>
+		                        		</td>
 			                        	<td class="text-right" style="border-top:1px solid black">
 			                        		<strong>
 			                        			<span t-esc="tax_line['price_subtotal']"/>
@@ -86,14 +97,21 @@
 			                        </tr>
 			                        <t t-if="sale_tax_line['tax_lines'].index(tax_line) != len(sale_tax_line['tax_lines'])-1">
 			                        	<tr>
-			                        		<td colspan="5"></td>
+			                        		<td colspan="6"></td>
 			                        	</tr>
 			                        </t>
 		                    	</t>
 		                        
 		                      	<tr class="border-black">
-		                            <td colspan="2" class="text-right"><strong><span t-esc="sale_tax_line['name']"/> - Total</strong></td>
+		                            <td colspan="2" class="text-right" style="white-space:nowrap;">
+		                            	<strong><span t-esc="sale_tax_line['name']"/> - Total</strong>
+	                            	</td>
 		                            <td></td>
+		                            <td class="text-right">
+		                            	 <strong>
+		                                	<span t-esc="sale_tax_line['journal_original_amount']"/>
+		                                </strong>
+		                            </td>
 		                            <td class="text-right">
 		                                <strong>
 		                                	<span t-esc="sale_tax_line['total_amount']"/>
@@ -142,7 +160,8 @@
 	                            <th style="vertical-align:middle;text-align:center">Tax Code</th>
 	                            <th style="vertical-align:middle;text-align:center">Tax Code Description/<br/>Invoice Number</th>
 	                            <th style="vertical-align:middle;text-align:center">Invoice Description</th>
-	                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Sales Excluding Tax)</th>
+	                            <th style="vertical-align:middle;text-align:center">Total Paid Amount<br/>(Purchase Including Tax)</th>
+	                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Purchase Excluding Tax)</th>
 	                            <th style="vertical-align:middle;text-align:center">Paid Amount<br/>(Tax Amount)</th>
 	                        </tr>
 	                    </thead>
@@ -171,6 +190,9 @@
 		                        		<span t-esc="invoice_detail['invoice_description']"/>
 		                        	</td>
 		                        	<td class="text-right">
+		                                 <span t-esc="invoice_detail['original_amount']"/>
+		                            </td>
+		                        	<td class="text-right">
 		                                 <span t-esc="invoice_detail['price_subtotal']"/>
 		                            </td>
 		                            <td class="text-right">
@@ -180,9 +202,14 @@
 		                        <tr>
 		                        	<td></td>
 		                        	<td></td>
-		                        	<td class="text-right" style="border-top:1px solid black">
+		                        	<td class="text-right" style="border-top:1px solid black;white-space:nowrap;">
 		                        		<strong><span t-esc="tax_line['name']"/> - Total</strong>
 		                        	</td>
+		                        	<td class="text-right" style="border-top:1px solid black">
+		                        		<strong >
+		                        			<span t-esc="tax_line['invoice_original_amount']"/>
+		                        		</strong>
+	                        		</td>
 		                        	<td class="text-right" style="border-top:1px solid black">
 		                        		<strong>
 		                        			<span t-esc="tax_line['price_subtotal']"/>
@@ -202,8 +229,15 @@
 	                    	</t>
 	                        
 	                      	<tr class="border-black">
-	                            <td colspan="2" class="text-right"><strong><span t-esc="purchase_tax_line['name']"/> - Total</strong></td>
+	                            <td colspan="2" class="text-right" style="white-space:nowrap">
+	                            	<strong><span t-esc="purchase_tax_line['name']"/> - Total</strong>
+                            	</td>
 	                            <td></td>
+	                            <td class="text-right">
+	                                <strong>
+	                                	<span t-esc="purchase_tax_line['journal_original_amount']"/>
+	                                </strong>
+	                            </td>
 	                            <td class="text-right">
 	                                <strong>
 	                                	<span t-esc="purchase_tax_line['total_amount']"/>
