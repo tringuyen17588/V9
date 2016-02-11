@@ -23,7 +23,7 @@
 				</group>
 				<footer>
 					<button name="%(action_open_tax_journal_items)d" type="action" class="oe_highlight" 
-					string="Open balances" context="{'date_from': date_from,'date_to': date_to, 'period_select':period_select}"/>
+					string="Open Journal Items" context="{'date_from': date_from,'date_to': date_to, 'period_select':period_select}"/>
 				</footer>
 			</form>
 		</field>
