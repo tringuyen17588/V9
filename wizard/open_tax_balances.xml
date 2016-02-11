@@ -29,5 +29,7 @@
 		<field name="context">{'show_button': True}</field>
 	</record>
 	
-	 <menuitem id="menu_tax_report_tree_hierarchy_with_balance" name="Tax Reports Balances" parent="menu_tax_reports" action="action_open_tax_balances"/>
+	
+	<menuitem id="menu_tax_report_tree_hierarchy_with_balances" name="Tax Reports Balances" parent="menu_tax_reports" action="action_open_tax_balances"/>
+	 
 </odoo>
