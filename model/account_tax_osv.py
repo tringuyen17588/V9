@@ -15,8 +15,8 @@ class account_tax(osv.osv):
         """
         fields = ['tax_amount', 'invoiced_amount']
         context = context
-        date_from = context.get('date_from',False)
-        date_to = context.get('date_to',False)
+        date_from = context.get('date_from', False)
+        date_to = context.get('date_to', False)
 
         invoice_states = ['open', 'paid']
         dates = [date_from, date_to]

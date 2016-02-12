@@ -26,6 +26,7 @@ Generate Reports based on Tax Codes
              'views/tax_report_hierarchy_view.xml',
              'views/tax_gst_report_detailed_journal_wise.xml',
              'wizard/tax_excel_report.xml',
+             'wizard/open_tax_journal_items.xml'
              ],
     'qweb': [],
     'installable': True,

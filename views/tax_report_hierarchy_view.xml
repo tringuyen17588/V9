@@ -119,6 +119,7 @@
             <field name="context">{'show_button': True, 'date_from': context.get('date_from'), 'date_to': context.get('date_to')}</field>
         </record>
         
+        
         <record id="view_account_tax_tree" model="ir.ui.view">
 			<field name="name">view.account.tax.tree</field>
 			<field name="model">account.tax</field>
@@ -133,6 +134,7 @@
 			</field>		
 		</record>
         
+			
       	<act_window id="action_account_tax_line_open"
         	name="Taxes"
         	res_model="account.tax"
@@ -141,9 +143,23 @@
 			view_mode="tree"
       		view_type="tree"
 	     	view_id="ia_au_gst_reporting.view_account_tax_tree"     	
-      		context="{'report_id': active_id, 'show_button':True, 'date_from':context.get('date_from'), 'date_to':context.get('date_to')}"/>
-              
-        <record id="view_account_account_tag_form" model="ir.ui.view">
+      		context="{'report_id': active_id, 'show_button':True, 'date_from':context.get('date_from'), 'date_to':context.get('date_to')}" />
+		    
+      	<act_window
+            id="act_open_acccount_move_lines"
+            name="Tax - Account Move Lines "
+            res_model="account.move.line"
+            context="{'search_default_tax_line_id':[active_id], 
+      					'date_to': context.get('date_to'),'date_from': context.get('date_from')}"
+      		domain="[('date', '&lt;=', context.get('date_to')),('date', '&gt;=', context.get('date_from'))]"
+            src_model="account.tax"
+			view_id="account.view_move_line_tree"
+      		view_mode="tree"
+      		view_type="form"
+      	 	key2="tree_but_open" 
+      	 	multi="True"/>      
+        
+      	<record id="view_account_account_tag_form" model="ir.ui.view">
             <field name="name">account.tag.form</field>
             <field name="model">account.account.tag</field>
             <field name="arch" type="xml">
@@ -161,7 +177,6 @@
         </record>
         
         <menuitem id="menu_tax_report_tree_hierarchy" name="Tax Reports Hierarchy" parent="menu_tax_reports" action="action_tax_report_tree_hierarchy_without_balance"/>
-<!--        <menuitem id="menu_tax_report_tree_hierarchy_with_balance" name="Tax Reports Balances" parent="menu_tax_reports" action="action_tax_report_tree_hierarchy"/-->
         
             <record id="action_tax_tags" model="ir.actions.act_window">
             <field name="name">Tax Groups</field>
