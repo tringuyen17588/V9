@@ -92,6 +92,7 @@ class GstReport(models.TransientModel):
                                    default='sum')
     journal_wise = fields.Boolean(string='Print Journal Lines',
                   help='Using this field you can Print Report Journal wise')
+    is_excel = fields.Boolean(string='Export to Excel?')
 
     @api.onchange('period_select')
     def onchange_period_select(self):
@@ -358,21 +359,44 @@ class GstReport(models.TransientModel):
         data['ids'] = self.env.context.get('active_ids', [])
         data['model'] = self.env.context.get('active_model', 'ir.ui.menu')
         data['form'] = self.read(['date_from', 'date_to', 'company_id',
-                                  'account_tax_id', 'account_report_id',
-                                  'journal_wise'])[0]
+                                  'account_report_id',
+                                  'journal_wise', 'is_excel'])[0]
         used_context = self._build_contexts(data)
         data['form']['used_context'] = dict(used_context,
                                     lang=self.env.context.get('lang', 'en_US'))
-#         report_obj = self.env['account.tax.report'].browse(
-#                                        data['form']['account_report_id'][0])
-        if self.account_report_type == 'detailed_report':
-            if self.journal_wise:
-                return self.env['report'].get_action(self,
-                 'ia_au_gst_reporting.tax_gst_detailed_report_journal_wise',
-                 data=data)
+        if data['form']['is_excel']:
+            if self.account_report_type == 'detailed_report':
+                if data['form']['journal_wise']:
+                    data['form']['is_excel'] = {'obj': 'detailed.gst.report.journal.lines',
+                                       'function': 'print_excel_report'}
+                    return {'type': 'ir.actions.report.xml',
+                            'report_name': 'ia_au_gst_reporting.tax_gst_detailed_report_journal_wise',
+                            'datas': data
+                            }
+                else:
+                    data['form']['is_excel'] = {'obj': 'detailed.gst.report.excel',
+                                    'function': 'print_excel_report'}
+                return {'type': 'ir.actions.report.xml',
+                        'report_name': 'ia_au_gst_reporting.tax_gst_report_detailed',
+                        'datas': data
+                        }
+            else:
+                data['form']['is_excel'] = {'obj': 'hierarchical.gst.report.excel',
+                                            'function': 'print_excel_report'
+                                            }
+                return {'type': 'ir.actions.report.xml',
+                        'report_name': 'ia_au_gst_reporting.report_tax_gst',
+                        'datas': data
+                        }
+        else:
+            if self.account_report_type == 'detailed_report':
+                if self.journal_wise:
+                    return self.env['report'].get_action(self,
+                    'ia_au_gst_reporting.tax_gst_detailed_report_journal_wise',
+                     data=data)
+                else:
+                    return self.env['report'].get_action(self,
+                     'ia_au_gst_reporting.tax_gst_report_detailed', data=data)
             else:
                 return self.env['report'].get_action(self,
-                 'ia_au_gst_reporting.tax_gst_report_detailed', data=data)
-        else:
-            return self.env['report'].get_action(self,
-                     'ia_au_gst_reporting.report_tax_gst', data=data)
+                         'ia_au_gst_reporting.report_tax_gst', data=data)
