@@ -8,7 +8,7 @@
 	</record>
 	
 	<record id="net_gst_to_paid_or_reclaimed" model="account.tax.report">
-		<field name="name">Net GST to be Paid/Reclaimed</field>
+		<field name="name">Net GST to be Paid[Reclaimed]</field>
 		<field name="type">sum</field>
 		<field name="sequence">1</field>
 		<field name="parent_id" ref="gst_report_root"/>

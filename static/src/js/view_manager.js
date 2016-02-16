@@ -77,23 +77,28 @@ ViewManager.include({
         $('.oe-control-panel').bind("DOMSubtreeModified",function(){
 			if($('li.active')[$('li.active').length-1]){
 				var inner_text = $('li.active')[$('li.active').length-1].innerText;
-				console.log("INNER TEXT::::::::", inner_text)
 				if(inner_text.indexOf('Tax Balances') == -1){
 					$('#export_to_excel').remove()
 				}
 				if (inner_text.indexOf('Tax Balances')!= -1){
 					var button = $('#export_to_excel').length;
-		        	if (button == 0 && self.action.context.hasOwnProperty("show_button") == true){
-		        		$(".oe-control-panel").after("<div id='export_to_excel'><button  class='oe_highlight' type='button' style='width:120px;height:30px'>Export to Excel</button></div>")
-		        	}
-		        	$("#export_to_excel").click(function() {
-		        		 var action = self.action;
-//		        		 self.action.context.show_button = true;
-		        		 if (action){
-		        			 $.fn.test_function(self, action);
-		        		 }
-		        		 
-		             });
+					if (self.action){
+						if(self.action.hasOwnProperty('context')){
+							if (button == 0 && self.action.context.hasOwnProperty("show_button") == true){
+				        		$(".oe-control-panel").after("<div id='export_to_excel'><button  class='oe_highlight' type='button' style='width:120px;height:30px'>Export to Excel</button></div>")
+				        	}
+				        	$("#export_to_excel").click(function() {
+				        		 var action = self.action;
+//				        		 self.action.context.show_button = true;
+				        		 if (action){
+				        			 $.fn.test_function(self, action);
+				        		 }
+				        		 
+				             });
+						}
+					}
+					
+		        	
 				}
 			}
 			  

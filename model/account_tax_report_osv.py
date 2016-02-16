@@ -132,7 +132,10 @@ class account_tax_report(osv.osv):
         report_balance = self.browse(cr, uid, ids, context)._compute_report_balance(self.browse(cr, uid, ids, context))
         for report in report_balance.keys():
             taxed_amount = report_balance.get(report).get('tax_amount')
-            res.update({report: taxed_amount})
+            if self.browse(cr, uid, report).parent_id:
+                res.update({report: unicode(format(taxed_amount, '.2f'))})
+            else:
+                res.update({report: ''})
         return res
 
     def compute_tax_excl_amount(self, cr, uid, ids, field_name, arg, context=None):
@@ -143,10 +146,16 @@ class account_tax_report(osv.osv):
         report_balance = self.browse(cr, uid, ids, context)._compute_report_balance(self.browse(cr, uid, ids, context))
         for report in report_balance.keys():
             invoiced_amount = report_balance.get(report).get('invoiced_amount')
-            res.update({report: invoiced_amount})
+            if self.browse(cr, uid, report).parent_id:
+                res.update({report: unicode(format(invoiced_amount, '.2f'))})
+            else:
+                res.update({report: ''})
         return res
 
     _columns = {
-        'amount_taxed': fields.function(compute_taxed_amount, string='Taxed Amount', type='float'),
-        'amount_tax_exclusive': fields.function(compute_tax_excl_amount, string='Invoiced Amount(Tax Excl.)', type='float')
+        'amount_taxed': fields.function(compute_taxed_amount,
+                                        string='Taxed Amount', type='char'),
+        'amount_tax_exclusive': fields.function(compute_tax_excl_amount,
+                                                string='Invoiced Amount(Tax Excl.)',
+                                                type='char')
     }
