@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from openerp import models, fields, api
+from openerp import models, fields, api, _
 from openerp.exceptions import Warning
 import tempfile
 from ..report.tax_gst_detailed_report_journal_wise import tax_gst_detailed_report_journal_wise
@@ -61,6 +61,8 @@ class detailed_gst_report_journal_lines(models.Model):
             sale_lines = res.get('Sale')
             purchase_lines = res.get('Purchase')
 #             for key in res.keys():
+            total_tax_amount_sale = 0.0
+            total_tax_amount_purchase = 0.0
             if sale_lines:
                 total_tax_amount_sale = 0.0
                 sheet.write_merge(row, row + 1, 0, 14, 'Sales', text_in_bold_and_large)
