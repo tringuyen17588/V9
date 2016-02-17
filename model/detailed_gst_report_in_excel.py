@@ -62,6 +62,8 @@ class detailed_gst_report_excel(models.Model):
             sale_lines = res.get('Sale')
             purchase_lines = res.get('Purchase')
 #             for key in res.keys():
+            total_tax_amount_purchase = 0.0
+            total_tax_amount_sale = 0.0
             if sale_lines:
                 total_tax_amount_sale = 0.0
                 total_price_subtotal_sale = 0.0
