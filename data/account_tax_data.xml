@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo >
-	<data noupdate="1">
+	<data noupdate="0">
 		<record id="gst_taxable_sale" model="account.tax">
 			<field name="name">GST Taxable Sale</field>
 			<field name="description">GST Taxable Sale (10%)</field>
