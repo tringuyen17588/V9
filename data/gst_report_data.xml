@@ -119,7 +119,7 @@
 		<field name="display_detail">detail_with_hierarchy</field>		
 		<field name="tax_ids" eval="[(6, 0, [ref('ia_bt_chart.au_tax_sale_GST'),ref('ia_bt_chart.au_tax_sale_GST_INC'),ref('ia_bt_chart.au_tax_sale_FRE'),
 		ref('ia_bt_chart.au_tax_sale_EXP'),ref('ia_bt_chart.au_tax_purchase_NCP'),ref('ia_bt_chart.au_tax_purchase_NCP_INC'),
-		ref('ia_bt_chart.au_tax_purchase_NCP_INC'),ref('ia_bt_chart.au_tax_purchase_GIG'), ref('ia_bt_chart.au_tax_purchase_INP'),
+		ref('ia_bt_chart.au_tax_purchase_CAP'),ref('ia_bt_chart.au_tax_purchase_GIG'), ref('ia_bt_chart.au_tax_purchase_INP'),
 		ref('ia_bt_chart.au_tax_purchase_taxable_IMP')])]"/>
 	</record>
 </odoo>
