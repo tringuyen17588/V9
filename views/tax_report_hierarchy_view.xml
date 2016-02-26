@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+        <!-- Account Tax Report -->
+
+        <record id="view_account_tax_report_form" model="ir.ui.view">
+            <field name="name">account.tax.report.form</field>
+            <field name="model">account.tax.report</field>
+            <field name="arch" type="xml">
+                <form string="Tax Report">
+                	<button string="Compute" type="object" name="compute_taxed_amount"/>
+                    <group col="4">
+                        <field name="name"/>
+                        <field name="parent_id" context="{'compute': True}"/>
+                        <field name="sequence"/>
+                        <field name="type"/>
+                        <field name="sign"/>
+                        <field name="style_overwrite"/>
+						<field name="amount_taxed"/>                        
+                    </group>
+                    <notebook attrs="{'invisible': [('type','not in',['accounts','account_type', 'account_report','detailed_report'])]}">
+                        <page string="Report">
+                            <group>
+                                <field name="display_detail" attrs="{'invisible': [('type','not in',['accounts','account_type'])]}"/>
+                                <field name="account_report_id" attrs="{'invisible': [('type', '!=', 'account_report')]}"/>
+                            </group>
+                            <field name="tag_ids" attrs="{'invisible': [('type', '!=', 'accounts')]}"/>
+                            <field name="tax_ids" attrs="{'invisible': [('type', 'not in', ['detailed_report','account_type'])]}"/>
+                        </page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_account_tax_report_tree" model="ir.ui.view">
+            <field name="name">account.tax.report.tree</field>
+            <field name="model">account.tax.report</field>
+            <field name="arch" type="xml">
+                <tree string="Tax Report">
+                    <field name="name"/>
+                    <field name="parent_id" invisible="1"/>
+                    <field name="type"/>
+                    <field name="account_report_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_account_tax_report_search" model="ir.ui.view">
+            <field name="name">account.tax.report.search</field>
+            <field name="model">account.tax.report</field>
+            <field name="arch" type="xml">
+                <search string="Tax Report">
+                    <field name="name" string="Tax Report"/>
+                    <field name="type"/>
+                    <field name="account_report_id"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Parent Report" icon="terp-folder-orange" domain="" context="{'group_by':'parent_id'}"/>
+                        <filter string="Report Type" icon="terp-stock_symbol-selection" domain="[]" context="{'group_by':'type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_account_tax_report_tree" model="ir.actions.act_window">
+            <field name="name">Tax Reports</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.tax.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_account_tax_report_search"/>
+            <field name="view_id" ref="view_account_tax_report_tree"/>
+        </record>
+        
+        <menuitem id="menu_tax_reports" name="Tax Reports" parent="account.menu_finance_configuration"/>
+
+        <menuitem id="menu_account_tax_reports_tree" name="Tax Report Templates" parent="menu_tax_reports" action="action_account_tax_report_tree"/>
+
+        <record id="view_tax_report_tree_hierarchy" model="ir.ui.view">
+            <field name="name">tax.report.hierarchy</field>
+            <field name="model">account.tax.report</field>
+            <field name="field_parent">children_ids</field>
+            <field name="arch" type="xml">
+                <tree string="Tax Reports Hierarchy" >
+                    <field name="name"/>
+                    <field name="type" invisible="1"/>
+					<field name="amount_tax_exclusive" style="align:right;"/>
+					<field name="amount_taxed"/>                    
+                    <field name="parent_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="view_tax_hierarchy_without_balances" model="ir.ui.view">
+            <field name="name">tax.report.hierarchy.without.balance</field>
+            <field name="model">account.tax.report</field>
+            <field name="field_parent">children_ids</field>
+            <field name="arch" type="xml">
+                <tree string="Tax Reports Hierarchy" >
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="parent_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+		
+         <record id="action_tax_report_tree_hierarchy_without_balance" model="ir.actions.act_window">
+            <field name="name">Tax Reports Hierarchy</field>
+            <field name="res_model">account.tax.report</field>
+            <field name="view_type">tree</field>
+            <field name="view_id" ref="view_tax_hierarchy_without_balances"/>
+            <field name="domain">[('parent_id','=',False)]</field>
+        </record>
+        
+        <record id="action_tax_report_tree_hierarchy" model="ir.actions.act_window">
+            <field name="name">Tax Balances</field>
+            <field name="res_model">account.tax.report</field>
+            <field name="view_type">tree</field>
+            <field name="view_id" ref="view_tax_report_tree_hierarchy"/>
+            <field name="domain">[('parent_id','=',False),('type','=','sum')]</field>
+            <field name="context">{'show_button': True, 'date_from': context.get('date_from'), 'date_to': context.get('date_to')}</field>
+        </record>
+        
+        
+        <record id="view_account_tax_tree" model="ir.ui.view">
+			<field name="name">view.account.tax.tree</field>
+			<field name="model">account.tax</field>
+			<field name="arch" type="xml">
+				<tree string="Tax Codes">
+	                <field name="name"/>
+	                <field name="type_tax_use"/>
+	                <field name="description" string="Short Name"/>
+	            	<field name="invoiced_amount"/>
+	            	<field name="taxed_amount" string="Taxed Amount"/>		
+				</tree>
+			</field>		
+		</record>
+        
+			
+      	<act_window id="action_account_tax_line_open"
+        	name="Taxes"
+        	res_model="account.tax"
+        	src_model="account.tax.report"
+  			key2="tree_but_open"
+			view_mode="tree"
+			view_type="tree"      	
+	     	view_id="ia_au_gst_reporting.view_account_tax_tree"     	
+      		context="{'report_id': active_id, 'show_button':True, 'date_from':context.get('date_from'), 'date_to':context.get('date_to')}" />
+		    
+      	<act_window
+            id="act_open_acccount_move_lines"
+            name="Tax - Account Move Lines "
+            res_model="account.move.line"
+            context="{'search_default_tax_line_id':[active_id], 
+      					'date_to': context.get('date_to'),'date_from': context.get('date_from')}"
+      		domain="[('date', '&lt;=', context.get('date_to')),('date', '&gt;=', context.get('date_from')),('tax_line_id','=',active_id)]"
+            src_model="account.tax"
+			key2="tree_but_open"       	
+      		view_mode="tree"
+			view_id="account.view_move_line_tree"
+      		view_type="tree"/>      
+        
+      	<record id="view_account_account_tag_form" model="ir.ui.view">
+            <field name="name">account.tag.form</field>
+            <field name="model">account.account.tag</field>
+            <field name="arch" type="xml">
+                <form string="Tag">
+                    <group col="4">
+                        <field name="name"/>
+                        <field name="applicability"/>
+                        <field name="color"/>
+                    </group>
+                    <group>
+                        <field name="tax_ids"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        
+        <menuitem id="menu_tax_report_tree_hierarchy" name="Tax Reports Hierarchy" parent="menu_tax_reports" action="action_tax_report_tree_hierarchy_without_balance"/>
+        
+            <record id="action_tax_tags" model="ir.actions.act_window">
+            <field name="name">Tax Groups</field>
+            <field name="res_model">account.account.tag</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <menuitem id="menu_tax_tags" name="Tax Groups" parent="menu_tax_reports" action="action_tax_tags"/>
+        
+</odoo>

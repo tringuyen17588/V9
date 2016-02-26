@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<record id="form_open_tax_balances" model="ir.ui.view">
+		<field name="name">form.open.tax.balances</field>
+		<field name="model">open.tax.balances</field>
+		<field name="arch" type="xml">
+			<form>
+				<group >
+					<field name="period_select"/>
+				</group>
+				<group colspan="4" col="4">
+					<field name="date_from" />
+					<field name="date_to"/>	
+				</group>
+				<footer>
+					<button name="%(action_tax_report_tree_hierarchy)d" type="action" class="oe_highlight" 
+					string="Open balances" context="{'date_from': date_from,'date_to': date_to, 'period_select':period_select}"/>
+				</footer>
+			</form>
+		</field>
+	</record>
+	
+	<record id="action_open_tax_balances" model="ir.actions.act_window">
+		<field name="name">Tax Report Balances</field>
+		<field name="res_model">open.tax.balances</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">form</field>
+		<field name="target">new</field>
+		<field name="context">{'show_button': True}</field>
+	</record>
+	
+	
+	<menuitem id="menu_tax_report_tree_hierarchy_with_balances" name="Tax Reports Balances" parent="menu_tax_reports" action="action_open_tax_balances"/>
+	 
+</odoo>

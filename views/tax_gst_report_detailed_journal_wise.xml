@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="tax_gst_detailed_report_journal_wise">
+    <t t-call="report.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="report.internal_layout">
+                <div class="page">
+					<div style="text-decoration: underline;font-weight:bold;margin-top:10px">
+						<h3>
+							<center>
+								<strong>
+									GST Report
+									<span t-if="o.date_from and o.date_to">
+										 For Duration 
+									<span class="left" t-field="o.date_from" /> to <span class="left" t-field="o.date_to" />
+									</span>
+								</strong>
+							</center>
+						</h3>
+					</div>
+					<t t-if="sale_tax_lines" >
+						<h4 style="text-decoration:underline">
+							<strong>Sales</strong>
+						</h4>
+						<table t-foreach="sale_tax_lines" t-as="sale_tax_line" class="table table-condensed">
+		                    <thead>
+		                    	<tr>
+		                    		<th colspan="5">
+		                    			<span t-esc="sale_tax_line['name']"/>
+		                    		</th>
+		                    	</tr>
+		                        <tr>
+		                            <th style="vertical-align:middle;text-align:center">Tax Code</th>
+		                            <th style="vertical-align:middle;text-align:center">Tax Code Description /<br/> Invoice Number</th>
+		                            <th style="vertical-align:middle;text-align:center">Invoice Description</th>
+		                            <th style="vertical-align:middle;text-align:center">Total Paid Amount<br/>(Sales Including Tax)</th>
+		                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Sales Excluding Tax)</th>
+		                            <th style="vertical-align:middle;text-align:center">Paid Amount<br/>(Tax Amount)</th>
+		                        </tr>
+		                    </thead>
+		                    <tbody>
+		                    	<t t-foreach="sale_tax_line['tax_lines']" t-as="tax_line">
+		                    		<tr >
+			                            <td class="text-left">
+			                                <strong>
+			                                	<span t-esc="tax_line['name']"/>
+			                                </strong>
+			                            </td>
+			                            <td class="text-left">
+			                            	<strong>
+			                            		<span t-esc="tax_line['description']"/>
+			                            	</strong>
+			                            </td>
+			                            <td></td>
+			                            <td></td>
+			                        </tr>
+			                        
+			                        <tr t-foreach="tax_line['invoice_details']" t-as="invoice_detail">
+			                        	<td></td>
+			                        	<td class="text-left">
+			                        		<span t-esc="invoice_detail['invoice_number']"/>
+			                        	</td>
+			                        	<td class="text-left">
+			                        		<span t-esc="invoice_detail['invoice_description']"/>
+			                        	</td>
+			                        	<td class="text-right">
+			                        		<span t-esc="invoice_detail['original_amount']"/>
+			                        	</td>
+			                        	<td class="text-right">
+			                                 <span t-esc="invoice_detail['price_subtotal']"/>
+			                            </td>
+			                            <td class="text-right">
+			                                <span t-esc="invoice_detail['tax_amount']" />
+			                            </td>
+			                        </tr>
+			                        <tr>
+			                        	<td></td>
+			                        	<td></td>
+			                        	<td class="text-right" style="border-top:1px solid black;white_space:nowrap">
+			                        		<strong><span t-esc="tax_line['name']"/> - Total</strong>
+		                        		</td>
+			                        	<td class="text-right" style="border-top:1px solid black">
+			                        		<strong >
+			                        			<span t-esc="tax_line['invoice_original_amount']"/>
+			                        		</strong>
+		                        		</td>
+			                        	<td class="text-right" style="border-top:1px solid black">
+			                        		<strong>
+			                        			<span t-esc="tax_line['price_subtotal']"/>
+			                        		</strong>
+			                            </td>
+			                            <td class="text-right" style="border-top:1px solid black">
+			                            	<strong>
+			                            		<span t-esc="tax_line['tax_amount']" />
+			                            	</strong>
+			                            </td>
+			                        </tr>
+			                        <t t-if="sale_tax_line['tax_lines'].index(tax_line) != len(sale_tax_line['tax_lines'])-1">
+			                        	<tr>
+			                        		<td colspan="6"></td>
+			                        	</tr>
+			                        </t>
+		                    	</t>
+		                        
+		                      	<tr class="border-black">
+		                            <td colspan="2" class="text-right" style="white-space:nowrap;">
+		                            	<strong><span t-esc="sale_tax_line['name']"/> - Total</strong>
+	                            	</td>
+		                            <td></td>
+		                            <td class="text-right">
+		                            	 <strong>
+		                                	<span t-esc="sale_tax_line['journal_original_amount']"/>
+		                                </strong>
+		                            </td>
+		                            <td class="text-right">
+		                                <strong>
+		                                	<span t-esc="sale_tax_line['total_amount']"/>
+		                                </strong>
+		                            </td>
+		                            <td class="text-right">
+		                                <strong>
+		                                	<span t-esc="sale_tax_line['total_tax_amount']"/>
+		                                </strong>
+		                            </td>
+		                        </tr>
+	                         	<t t-if="sale_tax_lines.index(sale_tax_line) != len(sale_tax_lines)-1">
+		                        	<tr>
+		                        		<td colspan="5"></td>
+		                        	</tr>
+		                        </t>
+		                    </tbody>
+	                    </table>
+                    <div class="row">
+                    	 <div class="col-xs-5 pull-right">
+		                    <table class="table table-condensed">
+		                        <tr class="border-black">
+		                            <td><strong>Sales Tax - Total</strong></td>
+		                            <td class="text-right">
+		                                <strong><span t-esc="sale_totals['sale_tax_total']" /></strong>
+		                            </td>
+		                        </tr>
+		                    </table>
+		                </div>
+                    </div>
+	               
+                </t>
+                
+				<t t-if="purchase_tax_lines" >
+					<h4 style="text-decoration:underline">
+						<strong>Purchase</strong>
+					</h4>
+					<table t-foreach="purchase_tax_lines" t-as="purchase_tax_line" class="table table-condensed">
+	                    <thead>
+	                    	<tr>
+	                    		<th colspan="5">
+	                    			<span t-esc="purchase_tax_line['name']"/>
+	                    		</th>
+	                    	</tr>
+	                        <tr>
+	                            <th style="vertical-align:middle;text-align:center">Tax Code</th>
+	                            <th style="vertical-align:middle;text-align:center">Tax Code Description/<br/>Invoice Number</th>
+	                            <th style="vertical-align:middle;text-align:center">Invoice Description</th>
+	                            <th style="vertical-align:middle;text-align:center">Total Paid Amount<br/>(Purchase Including Tax)</th>
+	                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Purchase Excluding Tax)</th>
+	                            <th style="vertical-align:middle;text-align:center">Paid Amount<br/>(Tax Amount)</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody>
+	                    	<t t-foreach="purchase_tax_line['tax_lines']" t-as="tax_line">
+	                    		<tr >
+		                            <td class="text-left">
+		                                <strong>
+		                                	<span t-esc="tax_line['name']"/>
+		                                </strong>
+		                            </td>
+		                            <td class="text-left">
+		                            	<strong>
+		                            		<span t-esc="tax_line['description']"/>
+		                            	</strong>
+		                            </td>
+		                           <td></td>
+		                           <td></td>
+		                        </tr>
+		                        <tr t-foreach="tax_line['invoice_details']" t-as="invoice_detail">
+		                        	<td></td>
+		                        	<td class="text-left">
+		                        		<span t-esc="invoice_detail['invoice_number']"/>
+		                        	</td>
+		                        	<td class="text-left">
+		                        		<span t-esc="invoice_detail['invoice_description']"/>
+		                        	</td>
+		                        	<td class="text-right">
+		                                 <span t-esc="invoice_detail['original_amount']"/>
+		                            </td>
+		                        	<td class="text-right">
+		                                 <span t-esc="invoice_detail['price_subtotal']"/>
+		                            </td>
+		                            <td class="text-right">
+		                                <span t-esc="invoice_detail['tax_amount']" />
+		                            </td>
+		                        </tr>
+		                        <tr>
+		                        	<td></td>
+		                        	<td></td>
+		                        	<td class="text-right" style="border-top:1px solid black;white-space:nowrap;">
+		                        		<strong><span t-esc="tax_line['name']"/> - Total</strong>
+		                        	</td>
+		                        	<td class="text-right" style="border-top:1px solid black">
+		                        		<strong >
+		                        			<span t-esc="tax_line['invoice_original_amount']"/>
+		                        		</strong>
+	                        		</td>
+		                        	<td class="text-right" style="border-top:1px solid black">
+		                        		<strong>
+		                        			<span t-esc="tax_line['price_subtotal']"/>
+		                        		</strong>
+		                            </td>
+		                            <td class="text-right" style="border-top:1px solid black">
+		                            	<strong>
+		                            		<span t-esc="tax_line['tax_amount']" />
+		                            	</strong>
+		                            </td>
+		                        </tr>
+		                        <t t-if="purchase_tax_line['tax_lines'].index(tax_line) != len(purchase_tax_line['tax_lines'])-1">
+		                        	<tr>
+		                        		<td colspan="5"></td>
+		                        	</tr>
+		                        </t>
+	                    	</t>
+	                        
+	                      	<tr class="border-black">
+	                            <td colspan="2" class="text-right" style="white-space:nowrap">
+	                            	<strong><span t-esc="purchase_tax_line['name']"/> - Total</strong>
+                            	</td>
+	                            <td></td>
+	                            <td class="text-right">
+	                                <strong>
+	                                	<span t-esc="purchase_tax_line['journal_original_amount']"/>
+	                                </strong>
+	                            </td>
+	                            <td class="text-right">
+	                                <strong>
+	                                	<span t-esc="purchase_tax_line['total_amount']"/>
+	                                </strong>
+	                            </td>
+	                            <td class="text-right">
+	                                <strong>
+	                                	<span t-esc="purchase_tax_line['total_tax_amount']"/>
+	                                </strong>
+	                            </td>
+	                        </tr>
+	                        <t t-if="purchase_tax_lines.index(purchase_tax_line) != len(purchase_tax_lines)-1">
+	                        	<tr>
+	                        		<td colspan="5"></td>
+	                        	</tr>
+	                        </t>
+	                    </tbody>
+                    </table>
+                    <div class="row">
+	                    <div class="col-xs-5 pull-right">
+		                    <table class="table table-condensed">
+		                        <tr class="border-black">
+		                            <td><strong>Purchase Tax Total</strong></td>
+		                            <td class="text-right">
+		                                <strong><span t-esc="purchase_totals['purchase_tax_total']" /></strong>
+		                            </td>
+		                        </tr>
+		                    </table>
+		                </div>
+	                </div>
+                </t>
+                
+                <div class="row">
+	                <div class="col-xs-4 pull-right">
+	                    <table class="table table-condensed">
+	                        <tr class="border-black">
+	                            <td><strong>Total Tax Owed</strong></td>
+	                             <td class="text-right">
+	                                <strong>
+	                                	<span t-esc="sale_totals['sale_tax_total']-purchase_totals['purchase_tax_total']"/>
+	                                </strong>
+	                            </td>
+	                        </tr>
+	                    </table>
+	                </div>
+	            </div>
+            	</div>
+            </t>
+        </t>
+    </t>
+</template>
+</odoo>

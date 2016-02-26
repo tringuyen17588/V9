@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	
+<template id="tax_gst_report_detailed">
+    <t t-call="report.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="report.internal_layout">
+                <div class="page">
+					<div style="text-decoration: underline;font-weight:bold;margin-top:10px">
+						<h3>
+							<center>
+								<strong>
+									GST Report
+									<span t-if="o.date_from and o.date_to">
+										 For Duration 
+									<span class="left" t-field="o.date_from" /> to <span class="left" t-field="o.date_to" />
+									</span>
+								</strong>
+							</center>
+						</h3>
+					</div>
+					<table t-if="sale_tax_lines"  class="table table-condensed">
+                    <thead>
+                    	<tr>
+                    		<th colspan="4">Sales</th>
+                    	</tr>
+                        <tr>
+                            <th style="vertical-align:middle;text-align:center">Tax Code</th>
+                            <th style="vertical-align:middle;text-align:center">Tax Code Description</th>
+                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Sales Excluding Tax)</th>
+                            <th style="vertical-align:middle;text-align:center">Paid Amount<br/>(Tax Amount)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    	<t t-foreach="sale_tax_lines" t-as="sale_tax">
+                    		 <tr t-if="sale_tax['amount_untaxed'] and sale_tax['taxed_amount']">
+	                            <td class="text-left">
+	                                <span t-esc="sale_tax['tax_code']"/>
+	                            </td>
+	                            <td class="text-left">
+	                                <span t-esc="sale_tax['tax_description']"/>
+	                            </td>
+	                            <td class="text-right">
+	                                 <span t-esc="sale_tax['amount_untaxed']"/>
+	                            </td>
+	                            <td class="text-right">
+	                                <span t-esc="sale_tax['taxed_amount']" />
+	                            </td>
+	                        </tr>
+                    	</t>
+                       
+                      	<tr class="border-black">
+                            <td colspan="2" class="text-right"><strong>Total</strong></td>
+                            <td class="text-right">
+                                <strong>
+                                	<span t-esc="sale_totals['sale_untaxed_total']"/>
+                                </strong>
+                            </td>
+                            <td class="text-right">
+                                <strong>
+                                	<span t-esc="sale_totals['sale_tax_total']"/>
+                                </strong>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+				
+                <table t-if="purchase_tax_lines" class="table table-condensed">
+                    <thead>
+                    	<tr>
+                    		<th colspan="4"> Purchase</th>
+                    	</tr>
+                        <tr>
+                            <th style="vertical-align:middle;text-align:center">Tax Code</th>
+                            <th style="vertical-align:middle;text-align:center">Tax Code Description</th>
+                            <th style="vertical-align:middle;text-align:center">Original Amount<br/>(Purchase Excluding Tax)</th>
+                            <th style="vertical-align:middle;text-align:center">Paid Amount<br/>(Tax Amount)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    	<t t-foreach="purchase_tax_lines" t-as="purchase_tax">
+                    		<tr t-if="purchase_tax['amount_untaxed'] and purchase_tax['taxed_amount']">
+	                            <td class="text-left">
+	                                <span t-esc="purchase_tax['tax_code']"/>
+	                            </td>
+	                            <td class="text-left">
+	                                <span t-esc="purchase_tax['tax_description']"/>
+	                            </td>
+	                            <td class="text-right">
+	                                 <span t-esc="purchase_tax['amount_untaxed']"/>
+	                            </td>
+	                            <td class="text-right">
+	                                <span t-esc="purchase_tax['taxed_amount']" />
+	                            </td>
+	                        </tr>
+                    	</t>
+                         <tr class="border-black">
+                            <td colspan="2" class="text-right"><strong>Total</strong></td>
+                            <td class="text-right">
+                                <strong>
+                                	<span t-esc="purchase_totals['purchase_untaxed_total']"/>
+                                </strong>
+                            </td>
+                            <td class="text-right">
+                                <strong>
+                                	<span t-esc="purchase_totals['purchase_tax_total']"/>
+                                </strong>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+	                <div class="col-xs-4 pull-right">
+	                    <table class="table table-condensed">
+	                        <tr class="border-black">
+	                            <td><strong>Total Tax Owed</strong></td>
+	                            <td class="text-right">
+	                                <strong>
+	                                	<span t-esc="sale_totals['sale_tax_total']-purchase_totals['purchase_tax_total']"/>
+	                                </strong>
+	                            </td>
+	                        </tr>
+	                    </table>
+	                </div>
+	            </div>
+            	</div>
+            </t>
+        </t>
+    </t>
+</template>
+</odoo>
