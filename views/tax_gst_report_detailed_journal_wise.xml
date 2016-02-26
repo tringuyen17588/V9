@@ -9,7 +9,7 @@
 						<h3>
 							<center>
 								<strong>
-									GST Report
+									GST Detail Report
 									<span t-if="o.date_from and o.date_to">
 										 For Duration 
 									<span class="left" t-field="o.date_from" /> to <span class="left" t-field="o.date_to" />

@@ -49,22 +49,43 @@ class report_tax_gst(models.AbstractModel):
                 request = "SELECT tax_id as id, COALESCE(SUM(amount), 0) as tax_amount FROM " \
                     "account_invoice as account_invoice_tax__invoice_id,account_invoice_tax " \
                     "WHERE tax_id IN %s  AND (account_invoice_tax.invoice_id=account_invoice_tax__invoice_id.id) AND " \
-                    "(account_invoice_tax__invoice_id.state in %s) GROUP BY tax_id"
+                    "(account_invoice_tax__invoice_id.state in %s) and (account_invoice_tax__invoice_id.type = 'in_invoice' or account_invoice_tax__invoice_id.type = 'out_invoice') GROUP BY tax_id"
+                request1 = "SELECT tax_id as id, COALESCE(SUM(amount), 0) as tax_amount FROM " \
+                    "account_invoice as account_invoice_tax__invoice_id,account_invoice_tax " \
+                    "WHERE tax_id IN %s  AND (account_invoice_tax.invoice_id=account_invoice_tax__invoice_id.id) AND " \
+                    "(account_invoice_tax__invoice_id.state in %s) and account_invoice_tax__invoice_id.type != 'in_invoice' and account_invoice_tax__invoice_id.type != 'out_invoice' GROUP BY tax_id"
+
                 params = (tuple(tax_codes._ids),) + (tuple(invoice_states),)
             else:
                 request = "SELECT tax_id as id, COALESCE(SUM(amount), 0) as tax_amount FROM " \
                     "account_invoice as account_invoice_tax__invoice_id,account_invoice_tax " \
                     "WHERE tax_id IN %s  AND (account_invoice_tax.invoice_id=account_invoice_tax__invoice_id.id) AND " \
                     "(account_invoice_tax__invoice_id.state in %s) AND (account_invoice_tax__invoice_id.date_invoice >= %s) AND "\
-                    "(account_invoice_tax__invoice_id.date_invoice <= %s) GROUP BY tax_id"
+                    "(account_invoice_tax__invoice_id.date_invoice <= %s) and (account_invoice_tax__invoice_id.type = 'in_invoice' or account_invoice_tax__invoice_id.type == 'out_invoice') GROUP BY tax_id"
+
+                request1 = "SELECT tax_id as id, COALESCE(SUM(amount), 0) as tax_amount FROM " \
+                    "account_invoice as account_invoice_tax__invoice_id,account_invoice_tax " \
+                    "WHERE tax_id IN %s  AND (account_invoice_tax.invoice_id=account_invoice_tax__invoice_id.id) AND " \
+                    "(account_invoice_tax__invoice_id.state in %s) AND (account_invoice_tax__invoice_id.date_invoice >= %s) AND "\
+                    "(account_invoice_tax__invoice_id.date_invoice <= %s) and (account_invoice_tax__invoice_id.type != 'in_invoice' and account_invoice_tax__invoice_id.type != 'out_invoice') GROUP BY tax_id"
 
                 params = (tuple(tax_codes._ids),) + (tuple(invoice_states),) + tuple(dates) 
             self.env.cr.execute(request, params)
-            for row in self.env.cr.dictfetchall():
+            kq = self.env.cr.dictfetchall()
+            self.env.cr.execute(request1, params)
+            kq1 = self.env.cr.dictfetchall()
+            for row in kq:
                 res[row['id']] = row
+                tax_am = 0
                 if res_inv.get(row['id']):
                     invoiced_amount = res_inv.get(row['id']).get('invoiced_amount')
                     res[row['id']].update({'invoiced_amount': invoiced_amount})
+                    tax_am = row.get('tax_amount')
+                for row1 in kq1:
+                    if row['id'] == row1['id']:
+                        if row1.get('tax_amount'):
+                            tax_am -= row1.get('tax_amount')
+                            res[row['id']]['tax_amount'] = tax_am
 
             for r_key in res_inv.keys():
                 if res.get(r_key):

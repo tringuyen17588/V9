@@ -47,14 +47,14 @@ class tax_gst_report_detailed(models.AbstractModel):
         domain.append(('state', 'in', ['open', 'paid']))
 
         #    Calculation of Sales Tax
-        customer_invoice_domain = domain + [('type', '=', 'out_invoice')]
+        customer_invoice_domain = domain + [('type', 'in', ['out_invoice', 'out_refund'])]
         customer_invoices = account_invoice_env.search(customer_invoice_domain)
 
-        vendor_invoice_domain = domain + [('type', '=', 'in_invoice')]
+        vendor_invoice_domain = domain + [('type', 'in', ['in_invoice', 'in_refund'])]
         vendor_invoices = account_invoice_env.search(vendor_invoice_domain)
 
         select_clause = 'select account_invoice_tax.tax_id , COALESCE(SUM(account_invoice_tax.amount), 0) as tax_amount,'\
-                        ' COALESCE(SUM(account_invoice.amount_untaxed), 0) as invoice_amount '\
+                        ' COALESCE(SUM(account_invoice.amount_untaxed), 0) as invoice_amount, account_invoice.type as type, account_invoice.id as inv_id '\
                         'from account_invoice_tax, account_invoice'
 
         if False in dates:
@@ -91,7 +91,7 @@ class tax_gst_report_detailed(models.AbstractModel):
                 self._cr.execute(select_clause + ' where ' + tax_where_clause + ' and ' +
                                  invoice_where_clause +
                                  ' and account_invoice_tax.invoice_id=account_invoice.id'
-                                 ' group by account_invoice_tax.tax_id '
+                                 ' group by account_invoice_tax.tax_id, account_invoice.type, account_invoice.id'
                                  )
                 result = self._cr.dictfetchall()
                 if False in dates:
@@ -106,15 +106,15 @@ class tax_gst_report_detailed(models.AbstractModel):
                 for tax_code in tax_code_from_invoice_lines:
                     line = {}
                     if False in dates:
-                        self._cr.execute("Select COALESCE(sum(price_subtotal),0.0) from account_invoice_line,"
+                        self._cr.execute("Select COALESCE(price_subtotal,0.0) from account_invoice_line,"
                                          "account_invoice_line_tax, account_invoice where "
                                          "account_invoice_line.id=account_invoice_line_tax.invoice_line_id"
                                          " and account_invoice.state in ('open', 'paid') "
                                          "and account_invoice_line.invoice_id=account_invoice.id"
                                          " and account_invoice_line_tax.tax_id=%s", 
-                                         tuple(tax_code.get('tax_id')))
+                                         tuple([tax_code.get('tax_id')]))
                     else:
-                        self._cr.execute("Select COALESCE(sum(price_subtotal),0.0) from account_invoice_line,"
+                        self._cr.execute("Select COALESCE(price_subtotal,0.0) from account_invoice_line,"
                                          "account_invoice_line_tax, account_invoice where "
                                          "account_invoice_line.id=account_invoice_line_tax.invoice_line_id"
                                          " and account_invoice.state in ('open', 'paid') "
@@ -143,9 +143,13 @@ class tax_gst_report_detailed(models.AbstractModel):
                     tax_obj = account_tax_env.browse(record['tax_id'])
                     tax_wise_data['tax_code'] = tax_obj.name
                     tax_wise_data['tax_description'] = tax_obj.description
-
-                    tax_wise_data['amount_untaxed'] = record['invoice_amount']
-                    tax_wise_data['taxed_amount'] = record['tax_amount']
+                    tmp_untax = 0
+                    for kk in self.env['account.invoice'].browse(record['inv_id']).invoice_line_ids:
+                        if record['tax_id'] in [kk1.id for kk1 in kk.invoice_line_tax_ids]:
+                            tmp_untax += kk.price_subtotal
+                    tax_wise_data['amount_untaxed'] = record['type'] in ['in_invoice', 'out_invoice'] and tmp_untax or 0 - tmp_untax
+#record['invoice_amount'] or 0 - record['invoice_amount']
+                    tax_wise_data['taxed_amount'] = record['type'] in ['in_invoice', 'out_invoice'] and record['tax_amount'] or 0 - record['tax_amount']
 
                     if tax_obj.type_tax_use == 'sale':
                         sale_recs = res['Sale']

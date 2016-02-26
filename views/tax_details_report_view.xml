@@ -10,7 +10,7 @@
 						<h3>
 							<center>
 								<strong>
-									GST Report
+									GST Detail Report
 									<span t-if="o.date_from and o.date_to">
 										 For Duration 
 									<span class="left" t-field="o.date_from" /> to <span class="left" t-field="o.date_to" />
@@ -33,7 +33,7 @@
                     </thead>
                     <tbody>
                     	<t t-foreach="sale_tax_lines" t-as="sale_tax">
-                    		 <tr t-if="sale_tax['amount_untaxed'] and sale_tax['taxed_amount']">
+                    		 <tr t-if="sale_tax['amount_untaxed']">
 	                            <td class="text-left">
 	                                <span t-esc="sale_tax['tax_code']"/>
 	                            </td>
@@ -79,7 +79,7 @@
                     </thead>
                     <tbody>
                     	<t t-foreach="purchase_tax_lines" t-as="purchase_tax">
-                    		<tr t-if="purchase_tax['amount_untaxed'] and purchase_tax['taxed_amount']">
+                    		<tr t-if="purchase_tax['amount_untaxed']">
 	                            <td class="text-left">
 	                                <span t-esc="purchase_tax['tax_code']"/>
 	                            </td>

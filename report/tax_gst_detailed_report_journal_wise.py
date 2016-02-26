@@ -189,8 +189,9 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                               " from account_invoice_tax where invoice_id=" +
                               str(l) + " and tax_id=" + str(tax))
                         tax_amount = self._cr.fetchone()
+                        inv_br = self.env['account.invoice'].browse(l)
                         if tax_amount:
-                            amount = tax_amount[0]
+                            amount = inv_br.type in ['in_invoice', 'out_invoice'] and tax_amount[0] or 0 - tax_amount[0]
                         else:
                             amount = 0.0
                         for inv_rec in invoice_record:
@@ -200,12 +201,12 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                             if tax_obj.amount_type == 'percent' and not tax_obj.price_include:
                                 tax_amount = (inv_rec.get('price_subtotal') * tax_obj.amount) / 100
                             elif tax_obj.price_include:
-                                tax_amount = inv_rec.get('price_unit') * inv_rec.get('qty') - inv_rec.get('price_subtotal')
-                            original_amount = inv_rec.get('price_subtotal') + tax_amount
+                                tax_amount = (inv_rec.get('price_unit') and inv_rec.get('price_unit') or 0) * (inv_rec.get('qty') and inv_rec.get('qty') or 0) - (inv_rec.get('price_subtotal') and inv_rec.get('price_subtotal') or 0)
+                            original_amount = eval(str(inv_rec.get('price_subtotal'))) + eval(str(tax_amount))
                             invoice_rec.update({'invoice_number': invoice_obj.number,
                                                 'price_subtotal': inv_rec.get('price_subtotal'),
-                                                'tax_amount': tax_amount,
-                                                'original_amount': original_amount,
+                                                'tax_amount': inv_br.type in ['in_invoice', 'out_invoice'] and tax_amount or 0 - tax_amount,
+                                                'original_amount': original_amount and (inv_br.type in ['in_invoice', 'out_invoice'] and original_amount or 0 - original_amount) or (inv_br.type in ['in_invoice', 'out_invoice'] and (float(inv_rec.get('price_subtotal')) + float(tax_amount)) or (0 - (float(inv_rec.get('price_subtotal')) + float(tax_amount)))),
                                                 'invoice_description': product_obj.name})
                             invoice_line_details.append(invoice_rec)
 #                             if invoice_record.index(inv_rec) != len(invoice_record) -1:
@@ -216,8 +217,8 @@ class tax_gst_detailed_report_journal_wise(models.AbstractModel):
                             invoice_price_unit += inv_rec.get('price_unit')
                             price_unit += inv_rec.get('price_unit')
                             price_subtotal += inv_rec.get('price_subtotal')
-                            invoice_original_amount += original_amount
-                            journal_original_amount += original_amount
+                            invoice_original_amount += inv_br.type in ['in_invoice', 'out_invoice'] and original_amount or (0 - original_amount)
+                            journal_original_amount += inv_br.type in ['in_invoice', 'out_invoice'] and original_amount or (0 - original_amount)
 
                         sum_amount += amount
 #                         invoice_rec.update({'invoice_number':
